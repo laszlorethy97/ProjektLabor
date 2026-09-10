@@ -12,7 +12,7 @@ docker compose up --build
 ​```
 
 - Frontend: http://localhost:4200
-- API (OpenAPI JSON): http://localhost:8080/openapi/v1.json
+- API (OpenAPI JSON): http://localhost:8081/openapi/v1.json
 
 ## Architektúra
 
