@@ -19,6 +19,6 @@ namespace KeyManagement.Api.Models.Entities
         public User HolderUser { get; set; } = null!;
         public User IssuedByUser { get; set; } = null!;
         public User? ReturnedToUser { get; set; }
-        
+        public Reservation? Reservation { get; set; }
     }
 }
