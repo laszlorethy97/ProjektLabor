@@ -20,6 +20,9 @@ namespace KeyManagement.Api.Models.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public ICollection<KeyTransaction> KeyTransactions { get; set; } = new List<KeyTransaction>();
 
     }
 }
