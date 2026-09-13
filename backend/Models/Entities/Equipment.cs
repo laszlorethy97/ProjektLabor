@@ -12,6 +12,6 @@ namespace KeyManagement.Api.Models.Entities
         [StringLength(50)]
         public string InventoryNumber { get; set; } = string.Empty;
         public bool IsWorking { get; set; } = true;
-        public ICollection<Room> Rooms { get; set; } = new List<Room>();
+        public Room Room { get; set; } = null!;
     }
 }

@@ -29,27 +29,27 @@ public class KeyManagementDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Room>()
-            .HasMany(e => e.Equipments)
-            .WithOne(r => r.Room)
+            .HasMany(r => r.Equipments)
+            .WithOne(e => e.Room)
             .HasForeignKey(e => e.RoomId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Room>()
             .HasMany(r => r.Reservations)
             .WithOne(r => r.Room)
-            .HasForeignKey(e => e.RoomId)
+            .HasForeignKey(r => r.RoomId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Room>()
             .HasMany(k => k.Keys)
             .WithOne(r => r.Room)
-            .HasForeignKey(e => e.RoomId)
+            .HasForeignKey(k => k.RoomId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>()
             .HasMany(u => u.UserRoles)
             .WithOne(r => r.User)
-            .HasForeignKey(e => e.UserId)
+            .HasForeignKey(u => u.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Reservation>()
@@ -85,19 +85,18 @@ public class KeyManagementDbContext : DbContext
         modelBuilder.Entity<Role>()
             .HasMany(r => r.UserRoles)
             .WithOne(ur => ur.Role)
-            .HasForeignKey(ur => ur.RoleId)
-            .OnDelete(DeleteBehavior.Restrict);ű
+            .HasForeignKey(r => r.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<UserRole>()
             .HasKey(ur => new { ur.UserId, ur.RoleId });
 
-
-
-
-
-
-
-        
+        modelBuilder.Entity<AuditLog>()
+            .HasOne(al => al.User)
+            .WithMany(u => u.AuditLogs)
+            .HasForeignKey(al => al.UserId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
 
     }
     }
