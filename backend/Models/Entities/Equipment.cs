@@ -6,12 +6,11 @@ namespace KeyManagement.Api.Models.Entities
     {
         
         public int Id { get; set; }
-        public int RoomId { get; set; }
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
-        [StringLength(50)]
-        public string InventoryNumber { get; set; } = string.Empty;
-        public bool IsWorking { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public User CreatedBy { get; set; } = null!;
         public Room Room { get; set; } = null!;
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

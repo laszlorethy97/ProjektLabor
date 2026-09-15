@@ -1,6 +1,6 @@
 namespace KeyManagement.Api.Models.Entities
 {
-    public class Reservation
+    public class Maintenance
     {
         
         public int Id { get; set; }
@@ -9,6 +9,5 @@ namespace KeyManagement.Api.Models.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public Room Room { get; set; } = null!;
         public User User { get; set; } = null!;
-        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
     }
 }

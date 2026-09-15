@@ -7,7 +7,7 @@ namespace KeyManagement.Api.Models.Entities
         
         public int Id { get; set; }
         [StringLength(50)]
-        public string Name{ get; set; }= string.Empty;
+        public string Type{ get; set; }= string.Empty;
 
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
        
