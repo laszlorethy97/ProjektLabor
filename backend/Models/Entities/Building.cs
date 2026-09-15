@@ -8,7 +8,6 @@ namespace KeyManagement.Api.Models.Entities
         public int Id { get; set; }
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
-        [StringLength(200)]
         public ICollection<Room> Rooms { get; set; } = new List<Room>();
     }
 }
