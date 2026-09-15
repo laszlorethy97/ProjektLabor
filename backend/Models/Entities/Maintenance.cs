@@ -1,6 +1,6 @@
 namespace KeyManagement.Api.Models.Entities
 {
-    public class Maintance
+    public class Maintenance
     {
         
         public int Id { get; set; }

@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using KeyManagement.Api.Models.Enums;
-
 namespace KeyManagement.Api.Models.Entities
 {
     public class Reservation
