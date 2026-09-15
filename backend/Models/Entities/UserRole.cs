@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+
 
 namespace KeyManagement.Api.Models.Entities
 {
@@ -6,11 +6,8 @@ namespace KeyManagement.Api.Models.Entities
     {
         
         public int Id { get; set; }
-        
-        public int UserId { get; set; }
-        public int RoleId { get; set; }
-        public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? RevokedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public User CreatedBy { get; set; } = null!;
         public User User { get; set; } = null!;
         public Role Role { get; set; } = null!;
        
