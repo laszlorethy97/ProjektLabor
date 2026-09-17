@@ -8,7 +8,7 @@ export const routes: Routes = [{
     children: [
         {
             component: LogInComponent,
-            path: 'log-in'
+            path: ''
         }
     ]
 }];
