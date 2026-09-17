@@ -1,0 +1,27 @@
+@use 'sass:string' as string;
+
+@mixin media-max($width){
+	@media only screen and (max-width: #{$width}px) { @content; }
+}
+@mixin media-min($width){
+	@media only screen and (min-width: #{$width}px) { @content; }
+}
+
+@mixin browseropt($element, $value){
+	-webkit-#{$element}: $value;
+	-moz-#{$element}: $value;
+	-ms-#{$element}: $value;
+	-o-#{$element}: $value;
+	#{$element}: $value;
+}
+
+@mixin placeholder{
+	&::-webkit-input-placeholder { @content }
+	&:-moz-placeholder 			{ @content }
+	&::-moz-placeholder 			{ @content }
+	&:-ms-placeholder 			{ @content }
+}
+
+@function rem($number){
+	@return string.unquote(calc($number / 16)+'rem');
+}

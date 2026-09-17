@@ -1,0 +1,31 @@
+@forward 'functions';
+@forward 'variables';
+
+@mixin primary-title{
+  font-family: $inter-font;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-size: rem(24);
+}
+
+@mixin core-page{
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+@mixin page{
+  @include core-page;
+  min-height: 100vh;
+}
+
+@mixin dialog{
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100vh;
+  width: 100vw;
+  border: 0;
+  display: block;
+}
+
