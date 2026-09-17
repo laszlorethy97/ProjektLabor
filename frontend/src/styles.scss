@@ -1,1 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+@use './scss/functions' as utils;
+@use './scss/variable' as vars;
+@use 'sass:list' as list;
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+*{
+  margin: 0;
+  padding: 0;
+}
+
+html{
+  font-family: "Inter";
+  font-style: normal;
+  font-weight:normal;
+  font-size: 16px;
+  $min-font-size: vars.$min-font-size;
+  $max-font-size: vars.$max-font-size;
+  $breakpoints: vars.$breakpoints;
+  //font-size: calc([minimum size]px + ([maximum size] - [minimum size]) * ((100vw - [minimum viewport width]) / ([maximum viewport width] - [minimum viewport width])));
+  @include utils.media-max(list.nth($breakpoints, 1)){
+    $min-viewport-width: list.nth($breakpoints, 1);
+    font-size: calc( #{ $min-font-size }px + ( #{ $max-font-size - $min-font-size } ) * (100vw / #{ $min-viewport-width }px));
+  }
+  @for $i from 1 through list.length($breakpoints) - 1 {
+    $min-viewport-width: list.nth($breakpoints, $i);
+    $max-viewport-width: list.nth($breakpoints, $i + 1);
+    @include utils.media-min($min-viewport-width){
+      font-size: calc( #{ $min-font-size }px + ( #{ $max-font-size - $min-font-size } ) * ( ( 100vw - #{ $min-viewport-width }px ) / ( #{ $max-viewport-width - $min-viewport-width } ) ) );
+    }
+  }
+  @include utils.media-min(list.nth($breakpoints, list.length($breakpoints))){
+    $min-viewport-width: list.nth($breakpoints, list.length($breakpoints));
+    font-size: 16px;
+  }
+}
+
+
+
+body {
+  font-family: "Inter";
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+html, body { height: 100%; }
