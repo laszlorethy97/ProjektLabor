@@ -1,1 +1,50 @@
-<p>log-in-component works!</p>
+<div class="login">
+  <section class="login__aside">
+    <div class="login__aside-body">
+      <h2 class="login__aside-title">Üdv újra itt!</h2>
+      <p class="login__aside-text">
+        Jelentkezz be, hogy elérd a projekteidet és folytathasd ott, ahol abbahagytad.
+      </p>
+    </div>
+  </section>
+
+  <section class="login__main">
+    <div class="login__card">
+      <header class="login__header">
+        <h1 class="login__title">Bejelentkezés</h1>
+        <p class="login__subtitle">Add meg az e-mail-címedet és a jelszavadat.</p>
+      </header>
+
+      <form class="login__form" novalidate>
+        <div class="login__field">
+          <label class="login__label" for="email">E-mail-cím</label>
+          <input
+            class="login__input"
+            id="email"
+            name="email"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="pelda@email.com"
+            required
+          />
+        </div>
+
+        <div class="login__field">
+          <label class="login__label" for="password">Jelszó</label>
+          <input
+            class="login__input"
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button class="login__submit" type="submit">Bejelentkezés</button>
+      </form>
+    </div>
+  </section>
+</div>

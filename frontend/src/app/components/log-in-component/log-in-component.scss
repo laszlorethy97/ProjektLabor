@@ -1,0 +1,168 @@
+@use '../../../scss/functions' as utils;
+@use '../../../scss/variable' as vars;
+@use 'sass:list' as list;
+
+$bp-sm: list.nth(vars.$breakpoints, 1);   
+$bp-md: list.nth(vars.$breakpoints, 2);   
+$bp-lg: list.nth(vars.$breakpoints, 3);   
+
+$ink: #0f172a;
+$ink-soft: #5b6478;
+$line: #dfe3ec;
+$surface: vars.$default-light;
+$surface-alt: #f4f6fb;
+$brand: #3b5bfd;
+$brand-dark: #2740c9;
+$aside-from: #1b2140;
+$aside-to: #3b2a6b;
+
+:host {
+  display: block;
+  font-family: vars.$inter-font;
+  color: $ink;
+}
+
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: $surface-alt;
+
+  @include utils.media-max($bp-lg) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.login__aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(#{utils.rem(24)}, 4vw, #{utils.rem(56)});
+  color: vars.$default-light;
+  background: linear-gradient(160deg, $aside-from 0%, $aside-to 100%);
+
+  @include utils.media-max($bp-lg) {
+    padding: clamp(#{utils.rem(24)}, 6vw, #{utils.rem(40)});
+  }
+}
+
+.login__aside-body {
+  max-width: utils.rem(420);
+}
+
+.login__aside-title {
+  font-size: clamp(#{utils.rem(24)}, 3vw, #{utils.rem(36)});
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.login__aside-text {
+  margin-top: utils.rem(12);
+  font-size: utils.rem(15);
+  line-height: 1.6;
+  color: rgba(vars.$default-light, 0.72);
+}
+
+.login__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(#{utils.rem(24)}, 5vw, #{utils.rem(64)}) clamp(#{utils.rem(16)}, 5vw, #{utils.rem(64)});
+}
+
+.login__card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: utils.rem(420);
+  padding: clamp(#{utils.rem(24)}, 4vw, #{utils.rem(40)});
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(20);
+  background-color: $surface;
+  box-shadow: 0 utils.rem(18) utils.rem(40) rgba($ink, 0.07);
+
+  @include utils.media-max($bp-sm) {
+    padding: utils.rem(20);
+    border: 0;
+    border-radius: utils.rem(16);
+    box-shadow: none;
+  }
+}
+
+.login__title {
+  font-size: clamp(#{utils.rem(22)}, 2.6vw, #{utils.rem(28)});
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.login__subtitle {
+  margin-top: utils.rem(8);
+  font-size: utils.rem(14);
+  line-height: 1.55;
+  color: $ink-soft;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(18);
+  margin-top: utils.rem(28);
+}
+
+.login__field {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(8);
+}
+
+.login__label {
+  font-size: utils.rem(13);
+  font-weight: 600;
+  color: $ink;
+}
+
+.login__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: utils.rem(48);
+  padding: utils.rem(12) utils.rem(14);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(12);
+  font-family: inherit;
+  font-size: utils.rem(15);
+  color: $ink;
+  background-color: $surface;
+  @include utils.browseropt(transition, (border-color 0.18s ease, box-shadow 0.18s ease));
+
+  @include utils.placeholder { color: rgba($ink-soft, 0.65); }
+
+  &:hover { border-color: #cbd2e0; }
+
+  &:focus {
+    outline: 0;
+    border-color: $brand;
+    box-shadow: 0 0 0 utils.rem(3) rgba($brand, 0.18);
+  }
+}
+
+.login__submit {
+  min-height: utils.rem(50);
+  margin-top: utils.rem(4);
+  padding: utils.rem(13) utils.rem(20);
+  border: 0;
+  border-radius: utils.rem(12);
+  font-size: utils.rem(15);
+  font-weight: 600;
+  color: vars.$default-light;
+  background-color: $brand;
+  cursor: pointer;
+  @include utils.browseropt(transition, (background-color 0.18s ease, transform 0.12s ease));
+
+  &:hover { background-color: $brand-dark; }
+  &:active { transform: translateY(utils.rem(1)); }
+
+  &:focus-visible {
+    outline: utils.rem(2) solid $brand-dark;
+    outline-offset: utils.rem(2);
+  }
+}
