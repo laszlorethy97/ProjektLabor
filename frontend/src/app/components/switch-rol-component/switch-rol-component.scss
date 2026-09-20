@@ -1,0 +1,117 @@
+@use '../../../scss/functions' as utils;
+@use '../../../scss/variable' as vars;
+@use 'sass:list' as list;
+
+$bp-sm: list.nth(vars.$breakpoints, 1);
+$bp-md: list.nth(vars.$breakpoints, 2);
+$bp-lg: list.nth(vars.$breakpoints, 3);
+$bp-xl: list.nth(vars.$breakpoints, 4);
+
+$ink: #0f172a;
+$ink-soft: #5b6478;
+$line: #dfe3ec;
+$surface: vars.$default-light;
+$surface-alt: #f4f6fb;
+$icon-bg: #e8ecf7;
+
+:host {
+  display: block;
+  font-family: vars.$inter-font;
+  color: $ink;
+}
+
+.switch-rol {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(#{utils.rem(24)}, 5vw, #{utils.rem(64)}) clamp(#{utils.rem(16)}, 5vw, #{utils.rem(64)});
+  background-color: $surface-alt;
+}
+
+.switch-rol__header {
+  max-width: utils.rem(640);
+  margin: 0 auto utils.rem(32);
+  text-align: center;
+}
+
+.switch-rol__title {
+  font-size: clamp(#{utils.rem(24)}, 3vw, #{utils.rem(34)});
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.switch-rol__subtitle {
+  margin-top: utils.rem(10);
+  font-size: utils.rem(15);
+  line-height: 1.6;
+  color: $ink-soft;
+}
+
+.switch-rol__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: utils.rem(20);
+  align-items: stretch;
+  max-width: utils.rem(1120);
+  margin: 0 auto;
+
+  @include utils.media-min($bp-md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include utils.media-min($bp-lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include utils.media-min($bp-xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.switch-rol__card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  min-width: 0;
+  padding: clamp(#{utils.rem(20)}, 2.5vw, #{utils.rem(28)});
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(18);
+  background-color: $surface;
+  box-shadow: 0 utils.rem(14) utils.rem(32) rgba($ink, 0.06);
+
+  @include utils.media-max($bp-sm) {
+    padding: utils.rem(18);
+    border-radius: utils.rem(14);
+    box-shadow: none;
+  }
+}
+
+.switch-rol__icon {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: utils.rem(44);
+  height: utils.rem(44);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(12);
+  background-color: $icon-bg;
+}
+
+.switch-rol__card-title {
+  margin-top: utils.rem(18);
+  min-height: calc(2 * 1.25em);
+  font-size: utils.rem(18);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.switch-rol__card-text {
+  margin-top: utils.rem(8);
+  font-size: utils.rem(14);
+  line-height: 1.55;
+  color: $ink-soft;
+  overflow-wrap: break-word;
+}

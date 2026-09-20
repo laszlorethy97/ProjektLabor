@@ -1,0 +1,16 @@
+<div class="switch-rol">
+  <header class="switch-rol__header">
+    <h1 class="switch-rol__title">Szerepkör választása</h1>
+    <p class="switch-rol__subtitle">Válaszd ki, melyik szerepkörrel szeretnél belépni.</p>
+  </header>
+
+  <section class="switch-rol__grid">
+    @for (role of roles; track role.key) {
+      <article class="switch-rol__card">
+        <span class="switch-rol__icon" aria-hidden="true"></span>
+        <h2 class="switch-rol__card-title">{{ role.name }}</h2>
+        <p class="switch-rol__card-text">{{ role.description }}</p>
+      </article>
+    }
+  </section>
+</div>
