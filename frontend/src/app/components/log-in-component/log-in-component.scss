@@ -12,6 +12,7 @@ $line: #dfe3ec;
 $surface: vars.$default-light;
 $surface-alt: #f4f6fb;
 $brand: #3b5bfd;
+$danger: #d64550;
 $brand-dark: #2740c9;
 $aside-from: #1b2140;
 $aside-to: #3b2a6b;
@@ -143,6 +144,20 @@ $aside-to: #3b2a6b;
     border-color: $brand;
     box-shadow: 0 0 0 utils.rem(3) rgba($brand, 0.18);
   }
+
+  &.ng-touched.ng-invalid {
+    border-color: $danger;
+
+    &:focus {
+      box-shadow: 0 0 0 utils.rem(3) rgba($danger, 0.18);
+    }
+  }
+}
+
+.login__message {
+  font-size: utils.rem(13);
+  line-height: 1.5;
+  color: $danger;
 }
 
 .login__submit {
@@ -164,5 +179,11 @@ $aside-to: #3b2a6b;
   &:focus-visible {
     outline: utils.rem(2) solid $brand-dark;
     outline-offset: utils.rem(2);
+  }
+
+  &:disabled {
+    background-color: rgba($brand, 0.45);
+    cursor: not-allowed;
+    transform: none;
   }
 }

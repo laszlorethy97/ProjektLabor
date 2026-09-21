@@ -15,7 +15,7 @@
         <p class="login__subtitle">Add meg az e-mail-címedet és a jelszavadat.</p>
       </header>
 
-      <form class="login__form" novalidate>
+      <form class="login__form" novalidate #userForm="ngForm" (ngSubmit)="login(userForm)">
         <div class="login__field">
           <label class="login__label" for="email">E-mail-cím</label>
           <input
@@ -27,7 +27,19 @@
             autocomplete="email"
             placeholder="pelda@email.com"
             required
+            email
+            ngModel
+            #email="ngModel"
           />
+          @if (email.touched && email.errors) {
+            <p class="login__message">
+              @if (email.errors['required']) {
+                Az e-mail-cím megadása kötelező.
+              } @else if (email.errors['email']) {
+                Érvényes e-mail-címet adj meg.
+              }
+            </p>
+          }
         </div>
 
         <div class="login__field">
@@ -40,10 +52,24 @@
             autocomplete="current-password"
             placeholder="••••••••"
             required
+            minlength="4"
+            ngModel
+            #password="ngModel"
           />
+          @if (password.touched && password.errors) {
+            <p class="login__message">
+              @if (password.errors['required']) {
+                A jelszó megadása kötelező.
+              } @else if (password.errors['minlength']) {
+                A jelszó legalább 4 karakter hosszú legyen.
+              }
+            </p>
+          }
         </div>
 
-        <button class="login__submit" type="submit">Bejelentkezés</button>
+        <button class="login__submit" type="submit" [disabled]="userForm.invalid">
+          Bejelentkezés
+        </button>
       </form>
     </div>
   </section>
