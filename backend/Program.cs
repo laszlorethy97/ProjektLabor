@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using KeyManagement.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddServices();
+
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<KeyManagement.Api.Data.KeyManagementDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
