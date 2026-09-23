@@ -22,8 +22,8 @@ export class LogInComponent {
     const dto: LoginDto = userForm.value as unknown as LoginDto
     this.loginService.login(dto).subscribe({
       next: (res) => {
-        console.log(res);
         this.authService.setToken(res.message);
+        this.router.navigate(['switch-rol']);
       },
       error: (err) =>{
         alert("Hibás bejelentkezés történt")

@@ -11,6 +11,6 @@ export class LogInService {
 
 
   login(dto: LoginDto): Observable<{message: string}>{
-    return this.httpClient.post<{message: string}>('', dto);
+    return this.httpClient.post<{message: string}>('/api/User/login', dto);
   }
 }
