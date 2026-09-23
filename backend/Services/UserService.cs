@@ -71,7 +71,7 @@ namespace KeyManagement.Api.Services
         public async Task<string?> LoginUser(LoginUserDTO loginUserDTO)
         {
             User? user = await FindUserByEmailAsync(loginUserDTO.Email);
-            if (user == null || !IsPasswordValid(user, loginUserDTO.PasswordHash))
+            if (user == null || !IsPasswordValid(user, loginUserDTO.Password))
             {
                 return null;
             }

@@ -29,7 +29,7 @@ namespace KeyManagement.Api.Migrations
             migrationBuilder.Sql("""
                 SET IDENTITY_INSERT Users ON;
                 INSERT INTO Users (Id, Email, PasswordHash, PinCode, CreatedAt, CreatedById)
-                VALUES (1, N'lala@lala.com', N'AQIAAACghgEAEAAAAL6x+JNkhuoePm0WlApJuc8AzOnBZ26ee3OlpAeRP4OSDmd3m2BLOUwEraWhHi09kg==', N'000000', '2026-09-23T00:00:00.0000000Z', NULL);
+                VALUES (1, N'lala@lala.com', N'AQAAAAIAAYagAAAAELqvc6NauIwFfKzzz2LTxjrbgFhUHATjuUwl76f+gkvSWL/NVWGTmgyDBubTl7ZPvQ==', N'000000', '2026-09-23T00:00:00.0000000Z', NULL);
                 SET IDENTITY_INSERT Users OFF;
                 """);
 
