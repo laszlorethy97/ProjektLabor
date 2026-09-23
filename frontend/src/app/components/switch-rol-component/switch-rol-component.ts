@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../../services/auth-service';
 
 export interface Role {
   key: string;
@@ -36,5 +37,10 @@ const ALL_ROLES: Role[] = [
   styleUrl: './switch-rol-component.scss',
 })
 export class SwitchRolComponent {
-  readonly roles: Role[] = ALL_ROLES.filter((role) => ['oktato', 'admin',].includes(role.key));
+  constructor(private readonly authService: AuthService) {}
+
+  get roles(): Role[] {
+    const tokenRoles = this.authService.getRoles(this.authService.getToken() ?? '');
+    return ALL_ROLES.filter((role) => tokenRoles.includes(role.key));
+  }
 }

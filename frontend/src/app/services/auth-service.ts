@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 interface JwtPayload {
   exp?: number;
   roles?: string[];
+  role?: string[] | string;
+  [key: string]: unknown;
 }
 
 @Injectable({
@@ -33,7 +35,17 @@ export class AuthService {
 
   getRoles(token: string): string[] {
     try {
-      return this.getPayload(token).roles ?? [];
+      const payload = this.getPayload(token);
+      const rawRoles = payload.roles ??
+        payload.role ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'] ??
+        [];
+
+      const normalized = Array.isArray(rawRoles) ? rawRoles : [rawRoles];
+      return normalized
+        .filter((role): role is string => typeof role === 'string')
+        .map((role) => role.toLowerCase());
     } catch {
       return [];
     }
