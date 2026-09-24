@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 interface JwtPayload {
   exp?: number;
-  roles?: string[];
+  [claim: string]: unknown;
 }
 
 @Injectable({
@@ -33,7 +33,17 @@ export class AuthService {
 
   getRoles(token: string): string[] {
     try {
-      return this.getPayload(token).roles ?? [];
+      const payload = this.getPayload(token);
+      const roleClaim = Object.entries(payload).find(([claim]) => {
+        const normalizedClaim = claim.toLowerCase();
+        return normalizedClaim === 'role'
+          || normalizedClaim === 'roles'
+          || normalizedClaim.endsWith('/role');
+      })?.[1];
+
+      return Array.isArray(roleClaim)
+        ? roleClaim.filter((role): role is string => typeof role === 'string')
+        : typeof roleClaim === 'string' ? [roleClaim] : [];
     } catch {
       return [];
     }

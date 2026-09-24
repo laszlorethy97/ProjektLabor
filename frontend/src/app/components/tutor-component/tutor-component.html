@@ -1,0 +1,21 @@
+<div class="tutor">
+  <header class="tutor__header">
+    <h1 class="tutor__title">Terem választása</h1>
+    <p class="tutor__subtitle">Válaszd ki, melyik termet szeretnéd lefoglalni.</p>
+  </header>
+
+  <ul class="tutor__list">
+    @for (room of rooms; track room.roomId) {
+      <li class="tutor__item" [class.tutor__item--selected]="room.roomId === selectedRoomId">
+        <div class="tutor__item-info">
+          <span class="tutor__building">{{ room.buildingName }} épület</span>
+          <span class="tutor__room">{{ room.roomName }} terem</span>
+          <span class="tutor__capacity">Férőhely: {{ room.capacity }} fő</span>
+        </div>
+        <button type="button" class="tutor__button" (click)="selectRoom(room)">Kiválaszt</button>
+      </li>
+    } @empty {
+      <li class="tutor__empty">Nincs elérhető terem.</li>
+    }
+  </ul>
+</div>
