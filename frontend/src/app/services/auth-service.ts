@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 interface JwtPayload {
   exp?: number;
+  [claim: string]: unknown;
   roles?: string[];
   role?: string[] | string;
   [key: string]: unknown;
@@ -36,6 +37,16 @@ export class AuthService {
   getRoles(token: string): string[] {
     try {
       const payload = this.getPayload(token);
+      const roleClaim = Object.entries(payload).find(([claim]) => {
+        const normalizedClaim = claim.toLowerCase();
+        return normalizedClaim === 'role'
+          || normalizedClaim === 'roles'
+          || normalizedClaim.endsWith('/role');
+      })?.[1];
+
+      return Array.isArray(roleClaim)
+        ? roleClaim.filter((role): role is string => typeof role === 'string')
+        : typeof roleClaim === 'string' ? [roleClaim] : [];
       const rawRoles = payload.roles ??
         payload.role ??
         payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??

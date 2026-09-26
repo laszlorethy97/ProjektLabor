@@ -1,0 +1,126 @@
+@use '../../../scss/functions' as utils;
+@use '../../../scss/variable' as vars;
+@use 'sass:list' as list;
+@use 'sass:color' as color;
+
+$bp-sm: list.nth(vars.$breakpoints, 1);
+
+$ink: #0f172a;
+$ink-soft: #5b6478;
+$line: #dfe3ec;
+$surface: vars.$default-light;
+$surface-alt: #f4f6fb;
+$accent: #2f55d4;
+$accent-soft: #e8ecf7;
+
+:host {
+  display: block;
+  font-family: vars.$inter-font;
+  color: $ink;
+}
+
+.tutor {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(#{utils.rem(24)}, 5vw, #{utils.rem(64)}) clamp(#{utils.rem(16)}, 5vw, #{utils.rem(64)});
+  background-color: $surface-alt;
+}
+
+.tutor__header {
+  max-width: utils.rem(640);
+  margin: 0 auto utils.rem(32);
+  text-align: center;
+}
+
+.tutor__title {
+  font-size: clamp(#{utils.rem(24)}, 3vw, #{utils.rem(34)});
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tutor__subtitle {
+  margin-top: utils.rem(10);
+  font-size: utils.rem(15);
+  line-height: 1.6;
+  color: $ink-soft;
+}
+
+.tutor__list {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(12);
+  max-width: utils.rem(720);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.tutor__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: utils.rem(16);
+  padding: utils.rem(16) utils.rem(20);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(14);
+  background-color: $surface;
+  box-shadow: 0 utils.rem(8) utils.rem(20) rgba($ink, 0.05);
+
+  @include utils.media-max($bp-sm) {
+    flex-direction: column;
+    align-items: stretch;
+    box-shadow: none;
+  }
+}
+
+.tutor__item--selected {
+  border-color: $accent;
+  background-color: $accent-soft;
+}
+
+.tutor__item-info {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(4);
+  min-width: 0;
+}
+
+.tutor__building {
+  font-size: utils.rem(13);
+  color: $ink-soft;
+}
+
+.tutor__room {
+  font-size: utils.rem(17);
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.tutor__capacity {
+  font-size: utils.rem(13);
+  color: $ink-soft;
+}
+
+.tutor__button {
+  flex: 0 0 auto;
+  padding: utils.rem(10) utils.rem(18);
+  border: none;
+  border-radius: utils.rem(10);
+  background-color: $accent;
+  color: $surface;
+  font: inherit;
+  font-size: utils.rem(14);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color.adjust($accent, $lightness: -8%);
+  }
+}
+
+.tutor__empty {
+  text-align: center;
+  color: $ink-soft;
+}

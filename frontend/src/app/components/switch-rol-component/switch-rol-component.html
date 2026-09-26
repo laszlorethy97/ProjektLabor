@@ -6,7 +6,7 @@
 
   <section class="switch-rol__grid">
     @for (role of roles; track role.key) {
-      <article class="switch-rol__card">
+      <article class="switch-rol__card" (click)="selectRole(role)" (keydown.enter)="selectRole(role)" (keydown.space)="selectRole(role)" [attr.tabindex]="role.key === 'oktato' ? 0 : null" [attr.role]="role.key === 'oktato' ? 'button' : null">
         <span class="switch-rol__icon" aria-hidden="true"></span>
         <h2 class="switch-rol__card-title">{{ role.name }}</h2>
         <p class="switch-rol__card-text">{{ role.description }}</p>
