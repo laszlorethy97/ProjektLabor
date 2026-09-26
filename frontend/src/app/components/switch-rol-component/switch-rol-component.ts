@@ -38,25 +38,20 @@ const ALL_ROLES: Role[] = [
   styleUrl: './switch-rol-component.scss',
 })
 export class SwitchRolComponent {
-  readonly roles: Role[];
-
   constructor(
     private readonly router: Router,
     private readonly authService: AuthService,
-  ) {
+  ) {}
+
+  get roles(): Role[] {
     const token = this.authService.getToken();
     const userRoles = token ? this.authService.getRoles(token) : [];
-    this.roles = ALL_ROLES.filter((role) => userRoles.includes(role.key));
+    return ALL_ROLES.filter((role) => userRoles.includes(role.key));
   }
 
   selectRole(role: Role): void {
     if (role.key === 'oktato') {
       void this.router.navigate(['/tutor']);
     }
-  constructor(private readonly authService: AuthService) {}
-
-  get roles(): Role[] {
-    const tokenRoles = this.authService.getRoles(this.authService.getToken() ?? '');
-    return ALL_ROLES.filter((role) => tokenRoles.includes(role.key));
   }
 }
