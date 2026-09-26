@@ -53,5 +53,10 @@ export class SwitchRolComponent {
     if (role.key === 'oktato') {
       void this.router.navigate(['/tutor']);
     }
+  constructor(private readonly authService: AuthService) {}
+
+  get roles(): Role[] {
+    const tokenRoles = this.authService.getRoles(this.authService.getToken() ?? '');
+    return ALL_ROLES.filter((role) => tokenRoles.includes(role.key));
   }
 }
