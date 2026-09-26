@@ -36,7 +36,11 @@ namespace KeyManagement.Api.Migrations
             migrationBuilder.Sql("""
                 SET IDENTITY_INSERT UserRoles ON;
                 INSERT INTO UserRoles (Id, CreatedAt, CreatedById, UserId, RoleId)
-                VALUES (1, '2026-09-23T00:00:00.0000000Z', 1, 1, 1);
+                VALUES
+                    (1, '2026-09-23T00:00:00.0000000Z', 1, 1, 1),
+                    (2, '2026-09-23T00:00:00.0000000Z', 1, 1, 2),
+                    (3, '2026-09-23T00:00:00.0000000Z', 1, 1, 3),
+                    (4, '2026-09-23T00:00:00.0000000Z', 1, 1, 4);
                 SET IDENTITY_INSERT UserRoles OFF;
                 """);
         }
@@ -44,9 +48,9 @@ namespace KeyManagement.Api.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("DELETE FROM UserRoles WHERE Id = 1;");
+            migrationBuilder.Sql("DELETE FROM UserRoles WHERE UserId = 1;");
             migrationBuilder.Sql("DELETE FROM Users WHERE Id = 1;");
-            migrationBuilder.Sql("DELETE FROM Roles WHERE Id = 1;");
+            migrationBuilder.Sql("DELETE FROM Roles WHERE Id BETWEEN 1 AND 4;");
         }
     }
 }
