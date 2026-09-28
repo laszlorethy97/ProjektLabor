@@ -5,6 +5,7 @@ import { SwitchRolComponent } from './components/switch-rol-component/switch-rol
 import { authGuard } from './auth-guard';
 import { TutorComponent } from './components/tutor-component/tutor-component';
 import { roleGuard } from './role-guard';
+import { RoomReservationComponent } from './components/room-reservation-component/room-reservation-component';
 
 export const routes: Routes = [{
     component: CommonComponent,
@@ -26,6 +27,10 @@ export const routes: Routes = [{
             data: {
                 roles: ['oktato']
             }
+        },
+        {
+            component: RoomReservationComponent,
+            path: 'reservation/:roomId'
         }
     ]
 }];

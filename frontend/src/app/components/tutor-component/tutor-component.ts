@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { RoomDto } from '../../dtos/room-dto';
 
 // TODO: ha a RoomDto megkapja a capacity mezőt, ez a típus törölhető és RoomDto használható helyette
@@ -30,6 +31,8 @@ const MOCK_ROOMS: TutorRoom[] = [
   styleUrl: './tutor-component.scss',
 })
 export class TutorComponent implements OnInit {
+  private readonly router = inject(Router);
+
   rooms: TutorRoom[] = [];
   selectedRoomId!: number
 
@@ -48,5 +51,6 @@ export class TutorComponent implements OnInit {
 
   selectRoom(room: TutorRoom): void {
     this.selectedRoomId = room.roomId;
+    void this.router.navigate(['/reservation', room.roomId]);
   }
 }

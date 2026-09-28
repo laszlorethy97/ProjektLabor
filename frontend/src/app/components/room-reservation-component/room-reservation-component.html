@@ -1,0 +1,81 @@
+<form class="reservation" (submit)="$event.preventDefault(); submit()">
+  <header class="reservation__header">
+    <h1 class="reservation__title">Terem foglalása</h1>
+    <p class="reservation__subtitle">Válassz napot, időpontot és a szükséges felszereléseket.</p>
+  </header>
+
+  <div class="reservation__card">
+    <section class="reservation__section">
+      <h2 class="reservation__label">Nap</h2>
+
+      <div class="calendar">
+        <div class="calendar__nav">
+          <button
+            type="button"
+            class="calendar__nav-button"
+            aria-label="Előző hónap"
+            [disabled]="!canGoToPrevMonth()"
+            (click)="prevMonth()"
+          >
+            ‹
+          </button>
+          <span class="calendar__month">{{ monthLabel() }}</span>
+          <button type="button" class="calendar__nav-button" aria-label="Következő hónap" (click)="nextMonth()">
+            ›
+          </button>
+        </div>
+
+        <div class="calendar__grid">
+          @for (label of weekdayLabels; track label) {
+            <span class="calendar__weekday">{{ label }}</span>
+          }
+          @for (day of calendarDays(); track day.date.getTime()) {
+            <button
+              type="button"
+              class="calendar__day"
+              [class.calendar__day--outside]="!day.inMonth"
+              [class.calendar__day--today]="isToday(day)"
+              [class.calendar__day--selected]="isSelected(day)"
+              [disabled]="day.disabled"
+              (click)="selectDate(day)"
+            >
+              {{ day.date.getDate() }}
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="reservation__section">
+      <label class="reservation__label" for="reservation-hour">Időpont</label>
+      <select id="reservation-hour" class="reservation__select" (change)="onHourChange($event)">
+        <option value="" [selected]="selectedHour() === null">Válassz időpontot…</option>
+        @for (hour of hours; track hour) {
+          <option [value]="hour" [selected]="selectedHour() === hour">{{ formatHour(hour) }}</option>
+        }
+      </select>
+    </section>
+
+    <section class="reservation__section">
+      <h2 class="reservation__label">Felszerelések</h2>
+      <ul class="reservation__equipments">
+        @for (equipment of equipments(); track equipment.id) {
+          <li>
+            <label class="reservation__checkbox">
+              <input
+                type="checkbox"
+                [checked]="isEquipmentSelected(equipment.id)"
+                (change)="toggleEquipment(equipment.id, $any($event.target).checked)"
+              />
+              <span>{{ equipment.name }}</span>
+            </label>
+          </li>
+        } @empty {
+          <li class="reservation__empty">Nincs elérhető felszerelés.</li>
+        }
+      </ul>
+    </section>
+
+    <button type="submit" class="reservation__submit" [disabled]="!reservation()">Foglalás</button>
+  </div>
+</form>
