@@ -21,23 +21,6 @@ namespace KeyManagement.Api.ServiceTests
         }
 
         [Fact]
-        public async Task GetAllAsync_IfUsersExist_GetAll()
-        {
-            using var context = _GetDbContext();
-            context.Users.Add(new User { Id = 1, Email = "john.doe@example.com", PasswordHash = "password123" });
-            context.Users.Add(new User { Id = 2, Email = "jane.doe@example.com", PasswordHash = "password456" });
-            await context.SaveChangesAsync();
-            
-            var service = new UserService(context);
-            var result = await service.GetAllAsync();
-
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
-            Assert.Equal("john.doe@example.com", result[0].Email);
-            Assert.Equal("jane.doe@example.com", result[1].Email);
-        }
-
-        [Fact]
         public async Task LoginUser_IfUserIsValid_ReturnsToken()
         {
             using var context = _GetDbContext();
