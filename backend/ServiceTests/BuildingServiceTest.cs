@@ -3,6 +3,7 @@ using KeyManagement.Api.Data;
 using KeyManagement.Api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using KeyManagement.Api.Services;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KeyManagement.Api.ServiceTests
 {
@@ -52,5 +53,20 @@ namespace KeyManagement.Api.ServiceTests
             Assert.Equal(id, result.Id);
             Assert.Equal(expectedName, result.Name);
         }
+
+        [Fact]
+        public async Task GetAllAsync_IfBuildingsDoesNotExist_ReturnsNull()
+        {
+            using var context = _GetDbContext();
+            context.Buildings.Add(new Building { Id = 1, Name = "Building 1" });
+            await context.SaveChangesAsync();
+            
+            var service = new BuildingService(context);
+            
+            var result = await service.GetByIdAsync(99);
+
+            Assert.Null(result);
+        }
+
     }
 }

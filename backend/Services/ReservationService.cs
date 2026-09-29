@@ -17,5 +17,10 @@ namespace KeyManagement.Api.Services
         {
             return await _context.Reservations.ToListAsync();
         }
+
+        public async Task<Reservation> CreateReservationAsync(int roomId, DateTime startTime, DateTime endTime, int userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
