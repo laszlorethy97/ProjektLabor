@@ -20,5 +20,11 @@ public class EquipmentController : ControllerBase
     {
         return Ok(await _service.GetAllAsync());
     }
+
+    [HttpGet("by-room-id/{roomId}")]
+    public async Task<ActionResult<List<Equipment>>> GetEquipmentsByRoomId(int roomId)
+    {
+        return Ok(await _service.GetEquipmentsByRoomId(roomId));
+    }
 }
 }
