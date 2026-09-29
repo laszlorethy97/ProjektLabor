@@ -15,10 +15,6 @@ public class EquipmentController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Equipment>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 }
 }

@@ -16,11 +16,7 @@ public class UserController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<User>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDTO  loginUserDTO)

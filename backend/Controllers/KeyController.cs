@@ -15,9 +15,4 @@ public class KeyController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Key>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
 }

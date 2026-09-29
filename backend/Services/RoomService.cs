@@ -14,10 +14,6 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<Room>> GetAllAsync()
-        {
-            return await _context.Rooms.ToListAsync();
-        }
 
         public async Task<List<RoomDTO>> GetRoomsByBuildingAsync()
         {

@@ -15,9 +15,5 @@ public class PermissionController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Permission>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 }
