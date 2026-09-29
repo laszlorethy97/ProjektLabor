@@ -13,6 +13,15 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
+        public async Task<List<Building>> GetAllAsync()
+        {
+            return await _context.Buildings.ToListAsync();
+        }
+
+         public async Task<Building> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }
