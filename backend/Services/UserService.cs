@@ -19,10 +19,6 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<User>> GetAllAsync()
-        {
-            return await _context.Users.ToListAsync();
-        }
 
         private async Task<User?> FindUserByEmailAsync(string email)
         {

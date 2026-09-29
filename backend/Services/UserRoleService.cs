@@ -13,9 +13,5 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<UserRole>> GetAllAsync()
-        {
-            return await _context.UserRoles.ToListAsync();
-        }
     }
 }

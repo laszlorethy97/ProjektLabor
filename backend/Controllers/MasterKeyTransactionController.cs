@@ -15,9 +15,5 @@ public class MasterKeyTransactionController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<MasterKeyTransaction>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 }

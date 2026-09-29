@@ -17,11 +17,7 @@ public class RoomController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Room>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 
     [HttpGet("by-building")]
     [Authorize]

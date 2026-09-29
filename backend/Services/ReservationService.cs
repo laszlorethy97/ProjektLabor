@@ -13,9 +13,6 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<Reservation>> GetAllAsync()
-        {
-            return await _context.Reservations.ToListAsync();
-        }
+
     }
 }

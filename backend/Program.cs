@@ -17,7 +17,7 @@ builder.Services.AddServices();
 
 builder.Services.AddOpenApi(options =>
 {
-    options.CreateSchemaReferenceId = type => type.FullName;
+    options.CreateSchemaReferenceId = typeInfo => typeInfo.Type.FullName;
 });
 builder.Services.AddDbContext<KeyManagement.Api.Data.KeyManagementDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
