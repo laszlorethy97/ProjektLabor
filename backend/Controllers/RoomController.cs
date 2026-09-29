@@ -2,6 +2,7 @@ using KeyManagement.Api.Models.Entities;
 using KeyManagement.Api.Services;
 using KeyManagement.Api.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KeyManagement.Api.Controllers;
 
@@ -23,6 +24,8 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("by-building")]
+    [Authorize]
+    [Authorize(Roles = "oktato")]
     public async Task<ActionResult<List<RoomDTO>>> GetRoomsByBuildingAsync()
     {
         return Ok(await _service.GetRoomsByBuildingAsync());
