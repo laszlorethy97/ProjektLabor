@@ -27,10 +27,10 @@ namespace KeyManagement.Api.Services
                 .ThenBy(r => r.Name)
                 .Select(r => new RoomDTO
                 {
-                    Id = r.Id,
-                    Name = r.Name,
+                    RoomId = r.Id,
+                    RoomName = r.Name,
                     Capacity = r.Capacity,
-                    Building = r.Building.Name
+                    BuildingName = r.Building.Name
                 })
                 .ToListAsync();
         }
