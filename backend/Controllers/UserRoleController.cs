@@ -15,9 +15,4 @@ public class UserRoleController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<UserRole>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
 }

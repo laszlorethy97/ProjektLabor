@@ -15,9 +15,5 @@ public class MaintenanceController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Maintenance>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 }

@@ -15,9 +15,5 @@ public class ReservationController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Reservation>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 }

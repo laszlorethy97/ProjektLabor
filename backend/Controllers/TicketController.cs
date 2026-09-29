@@ -15,9 +15,4 @@ public class TicketController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Ticket>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
 }

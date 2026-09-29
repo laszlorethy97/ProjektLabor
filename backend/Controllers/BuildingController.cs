@@ -15,9 +15,4 @@ public class BuildingController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Building>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
 }

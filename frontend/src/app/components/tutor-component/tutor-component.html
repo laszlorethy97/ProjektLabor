@@ -5,8 +5,8 @@
   </header>
 
   <ul class="tutor__list">
-    @for (room of rooms; track room.roomId) {
-      <li class="tutor__item" [class.tutor__item--selected]="room.roomId === selectedRoomId">
+    @for (room of rooms(); track room.roomId) {
+      <li class="tutor__item" [class.tutor__item--selected]="room.roomId === selectedRoomId()">
         <div class="tutor__item-info">
           <span class="tutor__building">{{ room.buildingName }} épület</span>
           <span class="tutor__room">{{ room.roomName }} terem</span>
