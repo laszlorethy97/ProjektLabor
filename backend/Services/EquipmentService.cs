@@ -13,6 +13,17 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
+        public async Task<List<Equipment>> GetAllAsync()
+        {
+            return await _context.Equipments.ToListAsync();
+        }
 
+        public async Task<List<Equipment>> GetEquipmentsByRoomId(int roomId)
+        {
+            return await _context
+                .Equipments
+                .Where(e => e.Room.Id == roomId)
+                .ToListAsync();
+        }
     }
 }
