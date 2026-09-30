@@ -15,9 +15,5 @@ public class RoleController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Role>>> GetAllAsync()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+
 }

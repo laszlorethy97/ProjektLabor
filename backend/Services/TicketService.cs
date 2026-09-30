@@ -13,9 +13,5 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<Ticket>> GetAllAsync()
-        {
-            return await _context.Tickets.ToListAsync();
-        }
     }
 }

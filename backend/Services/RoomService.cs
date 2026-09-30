@@ -14,10 +14,6 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<Room>> GetAllAsync()
-        {
-            return await _context.Rooms.ToListAsync();
-        }
 
         public async Task<List<RoomDTO>> GetRoomsByBuildingAsync()
         {
@@ -27,10 +23,10 @@ namespace KeyManagement.Api.Services
                 .ThenBy(r => r.Name)
                 .Select(r => new RoomDTO
                 {
-                    Id = r.Id,
-                    Name = r.Name,
+                    RoomId = r.Id,
+                    RoomName = r.Name,
                     Capacity = r.Capacity,
-                    Building = r.Building.Name
+                    BuildingName = r.Building.Name
                 })
                 .ToListAsync();
         }
