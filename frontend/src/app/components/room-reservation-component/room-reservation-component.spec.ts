@@ -51,4 +51,36 @@ describe('RoomReservationComponent', () => {
     expect(component.equipments()).toEqual(equipments);
     expect(items.length).toBe(2);
   });
+
+  it('should send the selected day, hour and equipments on submit', () => {
+    httpTesting.expectOne('/api/Equipment/by-room-id/7').flush([]);
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+
+    component.selectedDate.set(new Date(2030, 0, 15));
+    component.selectedHour.set(10);
+    component.toggleEquipment(1, true);
+    component.toggleEquipment(2, true);
+    component.toggleEquipment(2, false);
+    component.submit();
+
+    const request = httpTesting.expectOne('/api/Reservation');
+    request.flush(null);
+
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      roomId: 7,
+      startDate: new Date(2030, 0, 15, 10, 0, 0, 0),
+      equipmentIds: [1],
+    });
+    expect(alertSpy).toHaveBeenCalledWith('Sikeres foglalás!');
+    expect(component.isSubmitting()).toBe(false);
+  });
+
+  it('should not send anything until a day and an hour are selected', () => {
+    httpTesting.expectOne('/api/Equipment/by-room-id/7').flush([]);
+
+    component.submit();
+
+    httpTesting.expectNone('/api/Reservation');
+  });
 });

@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 
 import { RoomReservationService } from './room-reservation-service';
 import { RoomEquipmentDto } from '../dtos/room-equipment.dto';
+import { RoomReservationDto } from '../dtos/room-reservation.dto';
 
 describe('RoomReservationService', () => {
   let service: RoomReservationService;
@@ -33,5 +34,20 @@ describe('RoomReservationService', () => {
     httpTesting.expectOne('/api/Equipment/by-room-id/7').flush(equipments);
 
     expect(result).toEqual(equipments);
+  });
+
+  it('should send the reservation to the backend', () => {
+    const reservation: RoomReservationDto = {
+      roomId: 7,
+      startDate: new Date(2030, 0, 15, 10),
+      equipmentIds: [1, 2],
+    };
+
+    service.createReservation(reservation).subscribe();
+    const request = httpTesting.expectOne('/api/Reservation');
+    request.flush(null);
+
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(reservation);
   });
 });

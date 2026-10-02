@@ -1,7 +1,7 @@
-import { Component, OnInit, computed, inject, output, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
+import { finalize, map } from 'rxjs';
 import { RoomEquipmentDto } from '../../dtos/room-equipment.dto';
 import { RoomReservationDto } from '../../dtos/room-reservation.dto';
 import { RoomReservationService } from '../../services/room-reservation-service';
@@ -32,8 +32,6 @@ export class RoomReservationComponent implements OnInit {
     { requireSync: true },
   );
 
-  readonly reservationSubmit = output<RoomReservationDto>();
-
   readonly weekdayLabels = WEEKDAY_LABELS;
   readonly hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i);
 
@@ -41,6 +39,7 @@ export class RoomReservationComponent implements OnInit {
   readonly selectedDate = signal<Date | null>(null);
   readonly selectedHour = signal<number | null>(null);
   readonly selectedEquipmentIds = signal<number[]>([]);
+  readonly isSubmitting = signal(false);
 
   private readonly today = startOfDay(new Date());
   readonly viewMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
@@ -148,11 +147,19 @@ export class RoomReservationComponent implements OnInit {
   }
 
   submit(): void {
-    const dto = this.reservation();
-    if (!dto) {
+    const reservation = this.reservation();
+    if (!reservation || this.isSubmitting()) {
       return;
     }
-    this.reservationSubmit.emit(dto);
+
+    this.isSubmitting.set(true);
+    this.roomReservationService
+      .createReservation(reservation)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => alert('Sikeres foglalás!'),
+        error: () => alert('Nem sikerült a foglalás'),
+      });
   }
 
   private shiftMonth(delta: number): void {
