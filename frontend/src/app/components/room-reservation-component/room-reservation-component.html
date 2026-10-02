@@ -76,6 +76,6 @@
       </ul>
     </section>
 
-    <button type="submit" class="reservation__submit" [disabled]="!reservation()">Foglalás</button>
+    <button type="submit" class="reservation__submit" [disabled]="!reservation() || isSubmitting()">Foglalás</button>
   </div>
 </form>
