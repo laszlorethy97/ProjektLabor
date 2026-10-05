@@ -1,21 +1,15 @@
-import { Component, OnInit, computed, input, numberAttribute, output, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
+import { finalize, map } from 'rxjs';
 import { RoomEquipmentDto } from '../../dtos/room-equipment.dto';
 import { RoomReservationDto } from '../../dtos/room-reservation.dto';
+import { RoomReservationService } from '../../services/room-reservation-service';
 
-// Foglalható idősáv: 6:00-tól 22:00-ig, egész órás kezdéssel (az utolsó sáv 21:00–22:00)
 const FIRST_HOUR = 6;
 const LAST_HOUR = 22;
 
 const WEEKDAY_LABELS = ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'];
-
-// Teszt adatok, amíg a backend nem szolgáltatja a felszereléseket
-const MOCK_EQUIPMENTS: RoomEquipmentDto[] = [
-  { id: 1, name: 'Projektor' },
-  { id: 2, name: 'Tábla' },
-  { id: 3, name: 'Hangosítás' },
-  { id: 4, name: 'Számítógép' },
-  { id: 5, name: 'Webkamera' },
-];
 
 interface CalendarDay {
   date: Date;
@@ -30,13 +24,13 @@ interface CalendarDay {
   styleUrl: './room-reservation-component.scss',
 })
 export class RoomReservationComponent implements OnInit {
-  // A tutor komponenstől érkezik
-  readonly roomId = input<number | null, string | number | null>(null, {
-    transform: (value) => value === null ? null : numberAttribute(value),
-  });
+  private readonly route = inject(ActivatedRoute);
+  private readonly roomReservationService = inject(RoomReservationService);
 
-  // Érvényes foglalás elküldésekor ezt kapja meg a szülő / service
-  readonly reservationSubmit = output<RoomReservationDto>();
+  readonly roomId = toSignal(
+    this.route.paramMap.pipe(map((params) => parseRoomId(params.get('roomId')))),
+    { requireSync: true },
+  );
 
   readonly weekdayLabels = WEEKDAY_LABELS;
   readonly hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i);
@@ -45,6 +39,7 @@ export class RoomReservationComponent implements OnInit {
   readonly selectedDate = signal<Date | null>(null);
   readonly selectedHour = signal<number | null>(null);
   readonly selectedEquipmentIds = signal<number[]>([]);
+  readonly isSubmitting = signal(false);
 
   private readonly today = startOfDay(new Date());
   readonly viewMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
@@ -59,7 +54,6 @@ export class RoomReservationComponent implements OnInit {
 
   readonly calendarDays = computed<CalendarDay[]>(() => {
     const first = this.viewMonth();
-    // Hétfővel kezdődő hét: vasárnap (0) -> 6, hétfő (1) -> 0
     const offset = (first.getDay() + 6) % 7;
     const gridStart = new Date(first.getFullYear(), first.getMonth(), 1 - offset);
 
@@ -73,10 +67,6 @@ export class RoomReservationComponent implements OnInit {
     });
   });
 
-  /**
-   * A kitöltött űrlapból összeállított DTO, vagy null, ha még hiányzik valami
-   * (nap, óra vagy roomId). Ezt kell majd a service-nek továbbadni.
-   */
   readonly reservation = computed<RoomReservationDto | null>(() => {
     const date = this.selectedDate();
     const hour = this.selectedHour();
@@ -92,17 +82,20 @@ export class RoomReservationComponent implements OnInit {
     };
   });
 
-  // TODO: ide kerül majd a felszereléseket szolgáltató service
-  // constructor(private readonly equipmentService: EquipmentService) {}
-
   ngOnInit(): void {
     this.loadEquipments();
   }
 
   loadEquipments(): void {
-    // TODO: backend hívásra cserélni, pl.:
-    // this.equipmentService.getEquipments().subscribe((equipments) => this.equipments.set(equipments));
-    this.equipments.set(MOCK_EQUIPMENTS);
+    const roomId = this.roomId();
+    if (roomId === null) {
+      return;
+    }
+
+    this.roomReservationService.loadEquipments(roomId).subscribe({
+      next: (equipments) => this.equipments.set(equipments),
+      error: () => alert('Nem sikerült betölteni a felszereléseket'),
+    });
   }
 
   prevMonth(): void {
@@ -154,18 +147,30 @@ export class RoomReservationComponent implements OnInit {
   }
 
   submit(): void {
-    const dto = this.reservation();
-    if (!dto) {
+    const reservation = this.reservation();
+    if (!reservation || this.isSubmitting()) {
       return;
     }
-    // TODO: service hívás, pl.: this.reservationService.reserve(dto).subscribe(...)
-    this.reservationSubmit.emit(dto);
+
+    this.isSubmitting.set(true);
+    this.roomReservationService
+      .createReservation(reservation)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => alert('Sikeres foglalás!'),
+        error: () => alert('Nem sikerült a foglalás'),
+      });
   }
 
   private shiftMonth(delta: number): void {
     const current = this.viewMonth();
     this.viewMonth.set(new Date(current.getFullYear(), current.getMonth() + delta, 1));
   }
+}
+
+function parseRoomId(value: string | null): number | null {
+  const roomId = Number(value);
+  return value !== null && Number.isInteger(roomId) ? roomId : null;
 }
 
 function startOfDay(date: Date): Date {
