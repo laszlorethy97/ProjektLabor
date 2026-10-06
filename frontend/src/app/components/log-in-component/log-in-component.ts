@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { LogInService } from '../../services/log-in-service';
 import { LoginDto } from '../../dtos/login-dto';
@@ -12,11 +12,9 @@ import { AuthService } from '../../services/auth-service';
   styleUrl: './log-in-component.scss',
 })
 export class LogInComponent {
-  constructor(
-    private readonly router: Router,
-    private readonly loginService: LogInService,
-    private readonly authService: AuthService,
-  ){}
+  private readonly router = inject(Router);
+  private readonly loginService = inject(LogInService);
+  private readonly authService = inject(AuthService);
 
   login(userForm: NgForm){
     const dto: LoginDto = userForm.value as unknown as LoginDto
@@ -25,7 +23,7 @@ export class LogInComponent {
         this.authService.setToken(res.message);
         this.router.navigate(['switch-rol']);
       },
-      error: (err) =>{
+      error: () =>{
         alert("Hibás bejelentkezés történt")
       }
     });

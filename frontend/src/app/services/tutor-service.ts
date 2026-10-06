@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RoomDto } from '../dtos/room-dto';
 import { Observable } from 'rxjs';
@@ -7,9 +7,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class TutorService {
-  constructor(private readonly httpsClient: HttpClient){}
+  private readonly httpClient = inject(HttpClient);
 
   loadRooms(): Observable<RoomDto[]>{
-    return this.httpsClient.get<RoomDto[]>('/api/Room/by-building')
+    return this.httpClient.get<RoomDto[]>('/api/Room/by-building')
   }
 }
