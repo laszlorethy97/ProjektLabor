@@ -1,0 +1,29 @@
+<main class="janitor">
+  <header class="janitor__header">
+    <h1 class="janitor__title">Portási ügyintézés</h1>
+    <p class="janitor__subtitle">Válaszd ki, melyik műveletet szeretnéd elindítani.</p>
+  </header>
+
+  <section class="janitor__actions" aria-label="Portási műveletek">
+    <article class="janitor__card">
+      <span class="janitor__category">Kulcskezelés</span>
+      <h2 class="janitor__card-title">Kulcs felvétele</h2>
+      <p class="janitor__description">Rögzítsd egy teremkulcs felvételét.</p>
+      <button type="button" class="janitor__button" routerLink="/key-pickup">Kulcs felvétele</button>
+    </article>
+
+    <article class="janitor__card">
+      <span class="janitor__category">Kulcskezelés</span>
+      <h2 class="janitor__card-title">Kulcs leadása</h2>
+      <p class="janitor__description">Rögzítsd egy korábban felvett kulcs leadását.</p>
+      <button type="button" class="janitor__button" routerLink="/key-handover">Kulcs leadása</button>
+    </article>
+
+    <article class="janitor__card">
+      <span class="janitor__category">Hibabejelentés</span>
+      <h2 class="janitor__card-title">Hibajegy felvétele</h2>
+      <p class="janitor__description">Jelents be egy javításra vagy ellenőrzésre váró hibát.</p>
+      <button type="button" class="janitor__button" routerLink="/ticket">Hibajegy felvétele</button>
+    </article>
+  </section>
+</main>
