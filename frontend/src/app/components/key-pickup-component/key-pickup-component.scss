@@ -1,0 +1,115 @@
+@use '../../../scss/functions' as utils;
+@use '../../../scss/variable' as vars;
+@use 'sass:color';
+
+$ink: #0f172a;
+$ink-soft: #5b6478;
+$line: #dfe3ec;
+$surface: vars.$default-light;
+$surface-alt: #f4f6fb;
+$accent: #2f55d4;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: $ink;
+  font-family: vars.$inter-font;
+  background-color: $surface-alt;
+}
+
+.key-access {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(#{utils.rem(24)}, 5vw, #{utils.rem(64)}) clamp(#{utils.rem(16)}, 5vw, #{utils.rem(64)});
+}
+
+.key-access__header {
+  max-width: utils.rem(520);
+  margin: 0 auto utils.rem(28);
+  text-align: center;
+}
+
+.key-access__title {
+  font-size: clamp(#{utils.rem(24)}, 3vw, #{utils.rem(34)});
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.key-access__subtitle {
+  margin-top: utils.rem(10);
+  color: $ink-soft;
+  font-size: utils.rem(15);
+  line-height: 1.6;
+}
+
+.key-access__form {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(20);
+  max-width: utils.rem(520);
+  margin: 0 auto;
+  padding: utils.rem(24);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(14);
+  background-color: $surface;
+  box-shadow: 0 utils.rem(8) utils.rem(20) rgba($ink, 0.05);
+}
+
+.key-access__field {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(8);
+}
+
+.key-access__label {
+  color: $ink-soft;
+  font-size: utils.rem(14);
+  font-weight: 600;
+}
+
+.key-access__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: utils.rem(10) utils.rem(12);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(10);
+  background-color: $surface;
+  color: $ink;
+  font: inherit;
+  font-size: utils.rem(15);
+
+  &:focus {
+    outline: utils.rem(2) solid $accent;
+    outline-offset: utils.rem(1);
+  }
+}
+
+.key-access__submit {
+  padding: utils.rem(12) utils.rem(18);
+  border: none;
+  border-radius: utils.rem(10);
+  background-color: $accent;
+  color: $surface;
+  font: inherit;
+  font-size: utils.rem(15);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: color.adjust($accent, $lightness: -8%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.key-access__success {
+  margin: 0;
+  color: #166534;
+  font-size: utils.rem(14);
+}

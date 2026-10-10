@@ -1,1 +1,55 @@
-<p>key-handover-component works!</p>
+<main class="key-access">
+  <header class="key-access__header">
+    <h1 class="key-access__title">Kulcs leadása</h1>
+    <p class="key-access__subtitle">Add meg az email-címedet, a PIN-kódot és a leadni kívánt kulcsot.</p>
+  </header>
+
+  <form class="key-access__form" #handoverForm="ngForm" (ngSubmit)="submit()">
+    <div class="key-access__field">
+      <label class="key-access__label" for="handover-email">Email</label>
+      <input
+        class="key-access__input"
+        id="handover-email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="handover-pin-code">PIN-kód</label>
+      <input
+        class="key-access__input"
+        id="handover-pin-code"
+        type="text"
+        name="pinCode"
+        [(ngModel)]="pinCode"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="handover-key">Kulcs</label>
+      <input
+        class="key-access__input"
+        id="handover-key"
+        type="text"
+        name="key"
+        [(ngModel)]="key"
+        required
+      />
+    </div>
+
+    <button class="key-access__submit" type="submit" [disabled]="handoverForm.invalid">
+      Kulcs leadása
+    </button>
+
+    @if (mockDto) {
+      <p class="key-access__success" role="status">A leadási adatok elmentve a mock DTO-ba.</p>
+    }
+  </form>
+</main>
