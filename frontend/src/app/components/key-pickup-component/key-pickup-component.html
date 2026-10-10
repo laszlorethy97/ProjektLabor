@@ -1,1 +1,55 @@
-<p>key-pickup-component works!</p>
+<main class="key-access">
+  <header class="key-access__header">
+    <h1 class="key-access__title">Kulcs átvétele</h1>
+    <p class="key-access__subtitle">Add meg az email-címedet, a PIN-kódot és az átvenni kívánt kulcsot.</p>
+  </header>
+
+  <form class="key-access__form" #pickupForm="ngForm" (ngSubmit)="submit()">
+    <div class="key-access__field">
+      <label class="key-access__label" for="pickup-email">Email</label>
+      <input
+        class="key-access__input"
+        id="pickup-email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="pickup-pin-code">PIN-kód</label>
+      <input
+        class="key-access__input"
+        id="pickup-pin-code"
+        type="text"
+        name="pinCode"
+        [(ngModel)]="pinCode"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="pickup-key">Kulcs</label>
+      <input
+        class="key-access__input"
+        id="pickup-key"
+        type="text"
+        name="key"
+        [(ngModel)]="key"
+        required
+      />
+    </div>
+
+    <button class="key-access__submit" type="submit" [disabled]="pickupForm.invalid">
+      Kulcs átvétele
+    </button>
+
+    @if (mockDto) {
+      <p class="key-access__success" role="status">Az átvételi adatok elmentve a mock DTO-ba.</p>
+    }
+  </form>
+</main>
