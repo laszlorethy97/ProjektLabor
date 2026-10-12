@@ -57,28 +57,28 @@ namespace KeyManagement.Api.ServiceTests
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
 
-            await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00", ProjectorId), UserId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00", ProjectorId), UserId);
 
             var reservation = await context.Reservations
                 .Include(r => r.Room)
                 .Include(r => r.User)
                 .Include(r => r.Equipments)
                 .SingleAsync();
-            Assert.Equal(DateTime.Parse("2026-10-01 08:00"), reservation.StartTime);
-            Assert.Equal(DateTime.Parse("2026-10-01 08:45"), reservation.EndTime);
+            Assert.Equal(DateTime.Parse("2099-10-01 08:00"), reservation.StartTime);
+            Assert.Equal(DateTime.Parse("2099-10-01 08:45"), reservation.EndTime);
             Assert.Equal(RoomId, reservation.Room.Id);
             Assert.Equal(UserId, reservation.User.Id);
             Assert.Equal(ProjectorId, Assert.Single(reservation.Equipments).Id);
         }
 
         [Theory]
-        [InlineData("2026-10-01 07:00")]
-        [InlineData("2026-10-01 09:00")]
+        [InlineData("2099-10-01 07:00")]
+        [InlineData("2099-10-01 09:00")]
         public async Task CreateReservationAsync_IfNeighbouringHourIsReserved_CreatesReservation(string startDate)
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00"), UserId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00"), UserId);
 
             await service.CreateReservationAsync(_CreateReservationDTO(startDate), UserId);
 
@@ -90,11 +90,11 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            var otherRoomReservation = _CreateReservationDTO("2026-10-01 08:00");
+            var otherRoomReservation = _CreateReservationDTO("2099-10-01 08:00");
             otherRoomReservation.RoomId = OtherRoomId;
             await service.CreateReservationAsync(otherRoomReservation, UserId);
 
-            await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00"), UserId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00"), UserId);
 
             Assert.Equal(2, await context.Reservations.CountAsync());
         }
@@ -104,11 +104,11 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00"), UserId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00"), UserId);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:15"), UserId);
+                await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:15"), UserId);
             });
             Assert.Equal(1, await context.Reservations.CountAsync());
         }
@@ -118,21 +118,21 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00"), UserId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00"), UserId);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 07:30"), UserId);
+                await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 07:30"), UserId);
             });
             Assert.Equal(1, await context.Reservations.CountAsync());
         }
 
         [Theory]
-        [InlineData("2026-10-01 07:30", "2026-10-01 08:15")]
-        [InlineData("2026-10-01 08:30", "2026-10-01 10:00")]
-        [InlineData("2026-10-01 08:10", "2026-10-01 08:20")]
-        [InlineData("2026-09-30 00:00", "2026-10-02 00:00")]
-        [InlineData("2026-09-30 08:00", "2026-10-02 09:00")]
+        [InlineData("2099-10-01 07:30", "2099-10-01 08:15")]
+        [InlineData("2099-10-01 08:30", "2099-10-01 10:00")]
+        [InlineData("2099-10-01 08:10", "2099-10-01 08:20")]
+        [InlineData("2099-09-30 00:00", "2099-10-02 00:00")]
+        [InlineData("2099-09-30 08:00", "2099-10-02 09:00")]
         public async Task CreateReservationAsync_IfRoomIsUnderMaintenance_ThrowsConflict(string maintenanceStart, string maintenanceEnd)
         {
             using var context = await _GetSeededDbContext();
@@ -148,7 +148,7 @@ namespace KeyManagement.Api.ServiceTests
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00"), UserId);
+                await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00"), UserId);
             });
             Assert.Empty(context.Reservations);
         }
@@ -161,7 +161,7 @@ namespace KeyManagement.Api.ServiceTests
 
             await Assert.ThrowsAsync<ArgumentException>(async () =>
             {
-                await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00", OtherRoomEquipmentId), UserId);
+                await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00", OtherRoomEquipmentId), UserId);
             });
             Assert.Empty(context.Reservations);
         }
@@ -171,7 +171,7 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            var reservationDTO = _CreateReservationDTO("2026-10-01 08:00");
+            var reservationDTO = _CreateReservationDTO("2099-10-01 08:00");
             reservationDTO.RoomId = 99;
 
             await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
@@ -185,7 +185,7 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            var reservationDTO = _CreateReservationDTO("2026-10-01 08:00");
+            var reservationDTO = _CreateReservationDTO("2099-10-01 08:00");
 
             await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
             {
@@ -198,7 +198,7 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            var reservationDTO = _CreateReservationDTO("2026-10-01 08:00", 99);
+            var reservationDTO = _CreateReservationDTO("2099-10-01 08:00", 99);
 
             await Assert.ThrowsAsync<ArgumentException>(async () =>
             {
@@ -207,8 +207,8 @@ namespace KeyManagement.Api.ServiceTests
         }
 
         [Theory]
-        [InlineData("2026-10-08 08:00")]
-        [InlineData("2022-10-10 08:00")]
+        [InlineData("2000-10-08 08:00")]
+        [InlineData("2000-10-10 08:00")]
         public async Task CreateReservationAsync_IfReservationInPast_ThrowsError(string startDate)
         {
             using var context = await _GetSeededDbContext();
@@ -226,7 +226,7 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            var reservationDTO= _CreateReservationDTO("2026-10-12 02:00");
+            var reservationDTO= _CreateReservationDTO("2099-10-12 02:00");
 
             await Assert.ThrowsAsync<InvalidDataException>(async () =>
             {
@@ -239,8 +239,8 @@ namespace KeyManagement.Api.ServiceTests
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            await service.CreateReservationAsync(_CreateReservationDTO("2026-10-01 08:00", ProjectorId), UserId);
-            var secondDTO = _CreateReservationDTO("2026-10-01 08:00", ProjectorId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00", ProjectorId), UserId);
+            var secondDTO = _CreateReservationDTO("2099-10-01 08:00", ProjectorId);
             secondDTO.RoomId = OtherRoomId;
 
             await Assert.ThrowsAsync<ArgumentException>(async () =>
