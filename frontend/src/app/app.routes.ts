@@ -10,6 +10,8 @@ import { Janitor } from './components/janitor/janitor';
 import { KeyPickupComponent } from './components/key-pickup-component/key-pickup-component';
 import { KeyHandoverComponent } from './components/key-handover-component/key-handover-component';
 import { TicketComponent } from './components/ticket-component/ticket-component';
+import { MasterKeyComponent } from './components/master-key-component/master-key-component';
+import { MasterKeyHandoverComponent } from './components/master-key-handover-component/master-key-handover-component';
 
 export const routes: Routes = [{
     component: CommonComponent,
@@ -71,6 +73,22 @@ export const routes: Routes = [{
             data: {
                 roles: ['portas']
             }
-        }
+        },
+        {
+            component: MasterKeyComponent,
+            path: 'master-key',
+            canActivate: [authGuard, roleGuard],
+            data: {
+                roles: ['portas']
+            }
+        },
+        {
+            component: MasterKeyHandoverComponent,
+            path: 'master-key-handover',
+            canActivate: [authGuard, roleGuard],
+            data: {
+                roles: ['portas']
+            }
+        },
     ]
 }];
