@@ -18,9 +18,9 @@ namespace KeyManagement.Api.Services
             return await _context.Buildings.ToListAsync();
         }
 
-         public async Task<Building> GetByIdAsync(int id)
+        public async Task<Building?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Buildings.FindAsync(id);
         }
 
     }

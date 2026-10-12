@@ -29,6 +29,7 @@ namespace KeyManagement.Api.Services
 
             var startTime = reservationDTO.StartDate;
             var endTime = startTime.Add(ReservationLength);
+            EnsureReservationTimeIsValid(startTime, endTime);
             await EnsureRoomIsFreeAsync(room.Id, startTime, endTime);
 
             var reservation = new Reservation
@@ -44,6 +45,19 @@ namespace KeyManagement.Api.Services
             await _context.SaveChangesAsync();
 
             return reservation;
+        }
+
+        private static void EnsureReservationTimeIsValid(DateTime startTime, DateTime endTime)
+        {
+            if (startTime < DateTime.Now)
+            {
+                throw new ArgumentException("Reservations cannot be made in the past.");
+            }
+
+            if (startTime.TimeOfDay < TimeSpan.FromHours(6) || endTime.TimeOfDay > TimeSpan.FromHours(22))
+            {
+                throw new InvalidDataException("Reservations must be within school hours (06:00-22:00).");
+            }
         }
 
         private async Task<Room> FindRoomAsync(int roomId)
