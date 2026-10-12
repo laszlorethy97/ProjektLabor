@@ -122,7 +122,7 @@ namespace KeyManagement.Api.ServiceTests
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 07:30"), UserId);
+                await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:30"), UserId);
             });
             Assert.Equal(1, await context.Reservations.CountAsync());
         }
