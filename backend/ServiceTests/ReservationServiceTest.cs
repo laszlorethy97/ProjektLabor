@@ -72,13 +72,13 @@ namespace KeyManagement.Api.ServiceTests
         }
 
         [Theory]
-        [InlineData("2099-10-01 08:00")]
-        [InlineData("2099-10-01 10:00")]
+        [InlineData("2099-10-01 07:00")]
+        [InlineData("2099-10-01 09:00")]
         public async Task CreateReservationAsync_IfNeighbouringHourIsReserved_CreatesReservation(string startDate)
         {
             using var context = await _GetSeededDbContext();
             var service = new ReservationService(context);
-            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 09:00"), UserId);
+            await service.CreateReservationAsync(_CreateReservationDTO("2099-10-01 08:00"), UserId);
 
             await service.CreateReservationAsync(_CreateReservationDTO(startDate), UserId);
 
