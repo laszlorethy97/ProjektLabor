@@ -1,6 +1,9 @@
 using KeyManagement.Api.Models.Entities;
+using System.Security.Claims;
+using KeyManagement.Api.DTO;
 using KeyManagement.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KeyManagement.Api.Controllers;
 
@@ -15,4 +18,30 @@ public class KeyTransactionController : ControllerBase
         _service = service;
     }
 
-}
+    [HttpPost]
+    [Authorize]
+    [Authorize(Roles = "portas")]
+    public async Task<IActionResult> RecordKeyCheckoutAsync(KeyTransactionDTO keyTransactionDTO)
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        { 
+            await _service.RecordKeyCheckoutAsync(keyTransactionDTO, userId);
+            return Created();
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(new { message = exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(new { message = exception.Message });
+        }
+
+    }
+
+}   
