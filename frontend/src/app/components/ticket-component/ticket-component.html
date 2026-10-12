@@ -1,1 +1,34 @@
-<p>ticket-component works!</p>
+<main class="ticket">
+  <header class="ticket__header">
+    <h1 class="ticket__title">Hibajegy bejelentése</h1>
+    <p class="ticket__subtitle">Írd le röviden, mi hibásodott meg, és miben kérsz segítséget.</p>
+  </header>
+
+  <form class="ticket__form" #ticketForm="ngForm" (ngSubmit)="submit()">
+    <div class="ticket__field">
+      <label class="ticket__label" for="ticket-description">A probléma leírása</label>
+      <textarea
+        class="ticket__textarea"
+        id="ticket-description"
+        name="description"
+        [(ngModel)]="description"
+        (ngModelChange)="mockDto = null"
+        rows="7"
+        maxlength="2000"
+        placeholder="Például: A terem projektora nem kapcsol be."
+        required
+      ></textarea>
+      <p class="ticket__hint">Legfeljebb 2000 karakter.</p>
+    </div>
+
+    <button class="ticket__submit" type="submit" [disabled]="ticketForm.invalid || !description.trim()">
+      Hibajegy beküldése
+    </button>
+
+    @if (mockDto) {
+      <p class="ticket__status" role="status">
+        A hibajegy adatai elő vannak készítve. A beküldés szolgáltatása még nincs csatlakoztatva.
+      </p>
+    }
+  </form>
+</main>

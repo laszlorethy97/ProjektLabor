@@ -10,15 +10,23 @@ import { Router } from '@angular/router';
 export class Janitor {
   private readonly router = inject(Router);
 
-  navigateToKeyPickup(){
+  navigateToKeyPickup() {
     this.router.navigate(['/key-pickup']);
   }
 
-  navigateToKeyHandover(){
+  navigateToKeyHandover() {
     this.router.navigate(['/key-handover']);
   }
 
-  navigateToTicket(){
+  navigateToMasterKey() {
+    this.router.navigate(['/master-key']);
+  }
+
+  navigateToMasterKeyHandover() {
+    this.router.navigate(['/master-key-handover']);
+  }
+
+  navigateToTicket() {
     this.router.navigate(['/ticket']);
   }
 }
