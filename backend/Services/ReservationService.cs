@@ -54,9 +54,9 @@ namespace KeyManagement.Api.Services
                 throw new ArgumentException("Reservations cannot be made in the past.");
             }
 
-            if (startTime.TimeOfDay < TimeSpan.FromHours(6) || endTime.TimeOfDay > TimeSpan.FromHours(22))
+            if (startTime.TimeOfDay < TimeSpan.FromHours(8) || endTime.TimeOfDay > TimeSpan.FromHours(20))
             {
-                throw new InvalidDataException("Reservations must be within school hours (06:00-22:00).");
+                throw new InvalidDataException("Reservations must be within school hours (08:00-20:00).");
             }
         }
 
