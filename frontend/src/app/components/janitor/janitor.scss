@@ -1,0 +1,123 @@
+@use '../../../scss/functions' as utils;
+@use '../../../scss/variable' as vars;
+@use 'sass:list' as list;
+@use 'sass:color' as color;
+
+$bp-sm: list.nth(vars.$breakpoints, 1);
+
+$ink: #0f172a;
+$ink-soft: #5b6478;
+$line: #dfe3ec;
+$surface: vars.$default-light;
+$surface-alt: #f4f6fb;
+$accent: #2f55d4;
+
+:host {
+  display: block;
+  font-family: vars.$inter-font;
+  color: $ink;
+}
+
+.janitor {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(#{utils.rem(24)}, 5vw, #{utils.rem(64)}) clamp(#{utils.rem(16)}, 5vw, #{utils.rem(64)});
+  background-color: $surface-alt;
+}
+
+.janitor__header {
+  max-width: utils.rem(640);
+  margin: 0 auto utils.rem(32);
+  text-align: center;
+}
+
+.janitor__title {
+  font-size: clamp(#{utils.rem(24)}, 3vw, #{utils.rem(34)});
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.janitor__subtitle {
+  margin-top: utils.rem(10);
+  font-size: utils.rem(15);
+  line-height: 1.6;
+  color: $ink-soft;
+}
+
+.janitor__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, utils.rem(240)), 1fr));
+  gap: utils.rem(16);
+  max-width: utils.rem(960);
+  margin: 0 auto;
+}
+
+.janitor__card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: utils.rem(230);
+  padding: utils.rem(24);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(14);
+  background-color: $surface;
+  box-shadow: 0 utils.rem(8) utils.rem(20) rgba($ink, 0.05);
+
+  @include utils.media-max($bp-sm) {
+    min-height: auto;
+    padding: utils.rem(20);
+    box-shadow: none;
+  }
+}
+
+.janitor__category {
+  margin-bottom: utils.rem(14);
+  color: $accent;
+  font-size: utils.rem(12);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.janitor__card-title {
+  font-size: utils.rem(19);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.janitor__description {
+  margin-top: utils.rem(8);
+  color: $ink-soft;
+  font-size: utils.rem(14);
+  line-height: 1.6;
+}
+
+.janitor__button {
+  width: 100%;
+  margin-top: auto;
+  padding: utils.rem(12) utils.rem(16);
+  border: none;
+  border-radius: utils.rem(10);
+  background-color: $accent;
+  color: $surface;
+  font: inherit;
+  font-size: utils.rem(14);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, box-shadow 150ms ease;
+
+  &:hover {
+    background-color: color.adjust($accent, $lightness: -8%);
+  }
+
+  &:focus-visible {
+    outline: utils.rem(2) solid $accent;
+    outline-offset: utils.rem(3);
+  }
+
+  &:active {
+    box-shadow: inset 0 utils.rem(2) utils.rem(4) rgba($ink, 0.2);
+  }
+}

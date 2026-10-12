@@ -50,6 +50,8 @@ export class SwitchRolComponent {
   selectRole(role: Role): void {
     if (role.key === 'oktato') {
       void this.router.navigate(['/tutor']);
+    } else if (role.key === 'portas') {
+      void this.router.navigate(['/janitor']);
     }
   }
 }
