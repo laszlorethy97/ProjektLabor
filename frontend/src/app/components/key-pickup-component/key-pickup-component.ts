@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { KeyAccessDto } from '../../dtos/key-access.dto';
@@ -13,6 +13,7 @@ import { Keyservice } from '../../services/keyservice';
 })
 export class KeyPickupComponent {
   private readonly keyService = inject(Keyservice);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   email = '';
   pinCode = '';
@@ -41,10 +42,21 @@ export class KeyPickupComponent {
 
     this.keyService
       .pickUpKey(dto)
-      .pipe(finalize(() => (this.isSubmitting = false)))
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+          this.changeDetector.markForCheck();
+        }),
+      )
       .subscribe({
-        next: () => (this.isSubmitted = true),
-        error: (error: unknown) => (this.errorMessage = getPickupErrorMessage(error)),
+        next: () => {
+          this.isSubmitted = true;
+          this.changeDetector.markForCheck();
+        },
+        error: (error: unknown) => {
+          this.errorMessage = getPickupErrorMessage(error);
+          this.changeDetector.markForCheck();
+        },
       });
   }
 }

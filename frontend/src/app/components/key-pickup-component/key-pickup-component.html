@@ -49,6 +49,12 @@
       {{ isSubmitting ? 'Küldés...' : 'Kulcs átvétele' }}
     </button>
 
+    @if (isSubmitting) {
+      <p class="key-access__pending" role="status" aria-live="polite">
+        A kulcs átvétele folyamatban van, várj a visszajelzésre.
+      </p>
+    }
+
     @if (isSubmitted) {
       <p class="key-access__success" role="status">A kulcs átvétele sikeres.</p>
     }

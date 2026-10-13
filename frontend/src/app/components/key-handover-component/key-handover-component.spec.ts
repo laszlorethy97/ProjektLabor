@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
+import { Keyservice } from '../../services/keyservice';
 import { KeyHandoverComponent } from './key-handover-component';
 
 describe('KeyHandoverComponent', () => {
@@ -9,6 +11,12 @@ describe('KeyHandoverComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [KeyHandoverComponent],
+      providers: [
+        {
+          provide: Keyservice,
+          useValue: { returnKey: () => of(void 0) },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(KeyHandoverComponent);
@@ -18,19 +26,5 @@ describe('KeyHandoverComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should collect the handover form values in a mock DTO', () => {
-    component.email = 'user@example.com';
-    component.pinCode = '0042';
-    component.keyCode = ' KEY-001 ';
-
-    component.submit();
-
-    expect(component.mockDto).toEqual({
-      email: 'user@example.com',
-      pinCode: '0042',
-      keyCode: 'KEY-001',
-    });
   });
 });

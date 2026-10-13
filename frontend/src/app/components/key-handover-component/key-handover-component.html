@@ -45,12 +45,24 @@
       />
     </div>
 
-    <button class="key-access__submit" type="submit" [disabled]="handoverForm.invalid">
-      Kulcs leadása
+    <button class="key-access__submit" type="submit" [disabled]="handoverForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Küldés...' : 'Kulcs leadása' }}
     </button>
 
-    @if (mockDto) {
-      <p class="key-access__success" role="status">A leadási adatok elmentve a mock DTO-ba.</p>
+    @if (isSubmitting) {
+      <p class="key-access__pending" role="status" aria-live="polite">
+        A kulcs leadása folyamatban van, várj a visszajelzésre.
+      </p>
+    }
+
+    @if (isSubmitted) {
+      <p class="key-access__success" role="status">
+        A kulcs leadása sikeresen rögzítve.
+      </p>
+    }
+
+    @if (errorMessage) {
+      <p class="key-access__error" role="alert">{{ errorMessage }}</p>
     }
   </form>
 </main>

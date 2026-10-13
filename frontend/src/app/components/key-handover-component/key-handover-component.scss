@@ -110,6 +110,34 @@ $accent: #2f55d4;
 
 .key-access__success {
   margin: 0;
+  padding: utils.rem(14) utils.rem(16);
+  border: utils.rem(1) solid #86efac;
+  border-radius: utils.rem(10);
+  background-color: #f0fdf4;
   color: #166534;
   font-size: utils.rem(14);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.key-access__pending {
+  margin: 0;
+  padding: utils.rem(14) utils.rem(16);
+  border: utils.rem(1) solid #bfdbfe;
+  border-radius: utils.rem(10);
+  background-color: #eff6ff;
+  color: #1e40af;
+  font-size: utils.rem(14);
+  line-height: 1.5;
+}
+
+.key-access__error {
+  margin: 0;
+  padding: utils.rem(14) utils.rem(16);
+  border: utils.rem(1) solid #fca5a5;
+  border-radius: utils.rem(10);
+  background-color: #fef2f2;
+  color: #b91c1c;
+  font-size: utils.rem(14);
+  line-height: 1.5;
 }
