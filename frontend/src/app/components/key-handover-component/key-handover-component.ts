@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { KeyAccessDto } from '../../dtos/key-access.dto';
+
+interface KeyHandoverMockDto {
+  email: string;
+  pinCode: string;
+  keyCode: string;
+}
 
 @Component({
   selector: 'app-key-handover-component',
@@ -11,14 +16,14 @@ import { KeyAccessDto } from '../../dtos/key-access.dto';
 export class KeyHandoverComponent {
   email = '';
   pinCode = '';
-  key = '';
-  mockDto: KeyAccessDto | null = null;
+  keyCode = '';
+  mockDto: KeyHandoverMockDto | null = null;
 
   submit(): void {
     this.mockDto = {
       email: this.email.trim(),
       pinCode: this.pinCode,
-      key: this.key.trim(),
+      keyCode: this.keyCode.trim(),
     };
   }
 }
