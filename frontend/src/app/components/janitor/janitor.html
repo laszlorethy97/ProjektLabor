@@ -4,6 +4,10 @@
     <p class="janitor__subtitle">Válaszd ki, melyik műveletet szeretnéd elindítani.</p>
   </header>
 
+  @if (ticketSubmitted) {
+    <p class="janitor__success" role="status">A hibajegy sikeresen beküldve.</p>
+  }
+
   <section class="janitor__actions" aria-label="Portási műveletek">
     <article class="janitor__card">
       <span class="janitor__category">Kulcskezelés</span>

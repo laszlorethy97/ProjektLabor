@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 export class Janitor {
   private readonly router = inject(Router);
 
+  readonly ticketSubmitted = this.router.getCurrentNavigation()?.extras.state?.['ticketSubmitted'] === true;
+
   navigateToKeyPickup() {
     this.router.navigate(['/key-pickup']);
   }
