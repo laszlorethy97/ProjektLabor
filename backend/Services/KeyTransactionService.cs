@@ -47,6 +47,48 @@ namespace KeyManagement.Api.Services
             return keyTransaction;
         }
 
+
+        public async Task<KeyTransaction> RecordKeyReturnAsync(
+            KeyTransactionDTO keyTransactionDTO,
+            int endedByUserId)
+        {
+            var user = await FindUserAsync(keyTransactionDTO);
+            var key = await FindKeyAsync(keyTransactionDTO.KeyId);
+
+            var keyTransaction = await _context.KeyTransactions
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t =>
+                    t.Key.Id == key.Id &&
+                    t.EndedAt == null);
+
+            if (keyTransaction == null)
+            {
+                throw new KeyNotFoundException(
+                    "No open transaction found for this key.");
+            }
+
+            if (keyTransaction.User.Id != user.Id)
+            {
+                throw new InvalidOperationException(
+                    "This key was checked out by a different user.");
+            }
+
+            var endedByUser = await _context.Users.FindAsync(endedByUserId);
+
+            if (endedByUser == null)
+            {
+                throw new KeyNotFoundException(
+                    "Ended by user not found.");
+            }
+
+            keyTransaction.EndedAt = DateTime.UtcNow;
+            keyTransaction.EndedByUser = endedByUser;
+
+            await _context.SaveChangesAsync();
+
+            return keyTransaction;
+        }
+
         private async Task<User> FindUserAsync(KeyTransactionDTO keyTransactionDTO)
         {
             var user = await _context.Users
