@@ -32,13 +32,16 @@ public class TicketController : ControllerBase
         var userId = int.Parse(
             userIdClaim,
             System.Globalization.CultureInfo.InvariantCulture);
-                var ticket = await _service.CreateTicketAsync(
-                    dto.Description,
-                    userId);
+        var ticket = await _service.CreateTicketAsync(
+            dto.Description,
+            userId);
 
-        return CreatedAtAction(
-            nameof(CreateTicketAsync),
-            new { id = ticket.Id },
-            ticket);
+        return StatusCode(StatusCodes.Status201Created, new
+        {
+            ticket.Id,
+            ticket.Description,
+            ticket.CreatedAt,
+            CreatedById = userId
+        });
     }
 }
