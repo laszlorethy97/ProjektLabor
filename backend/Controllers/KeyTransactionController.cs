@@ -29,7 +29,7 @@ public class KeyTransactionController : ControllerBase
         }
 
         try
-        { 
+        {
             await _service.RecordKeyCheckoutAsync(keyTransactionDTO, userId);
             return Created();
         }
@@ -44,4 +44,32 @@ public class KeyTransactionController : ControllerBase
 
     }
 
-}   
+    [HttpPost("return")]
+    [Authorize(Roles = "portas")]
+    public async Task<IActionResult> RecordKeyReturnAsync(KeyTransactionDTO keyTransactionDTO)
+    {
+        if (!int.TryParse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier),
+            out int userId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var transaction = await _service.RecordKeyReturnAsync(
+                keyTransactionDTO,
+                userId);
+
+            return Ok(transaction);
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(new { message = exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(new { message = exception.Message });
+        }
+    }
+}
