@@ -23,14 +23,14 @@ describe('KeyHandoverComponent', () => {
   it('should collect the handover form values in a mock DTO', () => {
     component.email = 'user@example.com';
     component.pinCode = '0042';
-    component.key = 'Room 12';
+    component.keyCode = ' KEY-001 ';
 
     component.submit();
 
     expect(component.mockDto).toEqual({
       email: 'user@example.com',
       pinCode: '0042',
-      key: 'Room 12',
+      keyCode: 'KEY-001',
     });
   });
 });
