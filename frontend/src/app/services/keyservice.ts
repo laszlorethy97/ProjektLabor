@@ -12,4 +12,8 @@ export class Keyservice {
   pickUpKey(dto: KeyAccessDto): Observable<void> {
     return this.httpClient.post<void>('/api/KeyTransaction', dto);
   }
+
+  returnKey(dto: KeyAccessDto): Observable<void> {
+    return this.httpClient.post<void>('/api/KeyTransaction/return', dto);
+  }
 }

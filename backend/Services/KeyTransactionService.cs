@@ -53,7 +53,7 @@ namespace KeyManagement.Api.Services
             int endedByUserId)
         {
             var user = await FindUserAsync(keyTransactionDTO);
-            var key = await FindKeyAsync(keyTransactionDTO.KeyId);
+            var key = await FindKeyAsync(keyTransactionDTO.KeyCode);
 
             var keyTransaction = await _context.KeyTransactions
                 .Include(t => t.User)

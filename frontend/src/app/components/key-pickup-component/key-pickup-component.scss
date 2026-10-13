@@ -114,6 +114,17 @@ $accent: #2f55d4;
   font-size: utils.rem(14);
 }
 
+.key-access__pending {
+  margin: 0;
+  padding: utils.rem(14) utils.rem(16);
+  border: utils.rem(1) solid #bfdbfe;
+  border-radius: utils.rem(10);
+  background-color: #eff6ff;
+  color: #1e40af;
+  font-size: utils.rem(14);
+  line-height: 1.5;
+}
+
 .key-access__error {
   margin: 0;
   color: #b91c1c;

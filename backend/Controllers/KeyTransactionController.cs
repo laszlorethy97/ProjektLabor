@@ -57,11 +57,11 @@ public class KeyTransactionController : ControllerBase
 
         try
         {
-            var transaction = await _service.RecordKeyReturnAsync(
+            await _service.RecordKeyReturnAsync(
                 keyTransactionDTO,
                 userId);
 
-            return Ok(transaction);
+            return NoContent();
         }
         catch (KeyNotFoundException exception)
         {
