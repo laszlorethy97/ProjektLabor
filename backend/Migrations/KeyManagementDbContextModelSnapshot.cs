@@ -110,6 +110,9 @@ namespace KeyManagement.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("RoomId");

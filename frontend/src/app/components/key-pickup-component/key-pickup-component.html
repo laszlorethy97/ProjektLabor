@@ -1,7 +1,7 @@
 <main class="key-access">
   <header class="key-access__header">
     <h1 class="key-access__title">Kulcs átvétele</h1>
-    <p class="key-access__subtitle">Add meg az email-címedet, a PIN-kódot és az átvenni kívánt kulcsot.</p>
+    <p class="key-access__subtitle">Add meg az email-címedet, a PIN-kódot és az átvenni kívánt kulcs kódját.</p>
   </header>
 
   <form class="key-access__form" #pickupForm="ngForm" (ngSubmit)="submit()">
@@ -33,23 +33,28 @@
     </div>
 
     <div class="key-access__field">
-      <label class="key-access__label" for="pickup-key">Kulcs</label>
+      <label class="key-access__label" for="pickup-key">Kulcskód</label>
       <input
         class="key-access__input"
         id="pickup-key"
         type="text"
-        name="key"
-        [(ngModel)]="key"
+        name="keyCode"
+        [(ngModel)]="keyCode"
+        maxlength="25"
         required
       />
     </div>
 
-    <button class="key-access__submit" type="submit" [disabled]="pickupForm.invalid">
-      Kulcs átvétele
+    <button class="key-access__submit" type="submit" [disabled]="pickupForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Küldés...' : 'Kulcs átvétele' }}
     </button>
 
-    @if (mockDto) {
-      <p class="key-access__success" role="status">Az átvételi adatok elmentve a mock DTO-ba.</p>
+    @if (isSubmitted) {
+      <p class="key-access__success" role="status">A kulcs átvétele sikeres.</p>
+    }
+
+    @if (errorMessage) {
+      <p class="key-access__error" role="alert">{{ errorMessage }}</p>
     }
   </form>
 </main>

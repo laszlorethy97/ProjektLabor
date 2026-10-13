@@ -18,7 +18,7 @@ namespace KeyManagement.Api.Services
         public async Task<KeyTransaction> RecordKeyCheckoutAsync(KeyTransactionDTO keyTransactionDTO, int startedByUserId)
         {
             var user = await FindUserAsync(keyTransactionDTO);
-            var key = await FindKeyAsync(keyTransactionDTO.KeyId);
+            var key = await FindKeyAsync(keyTransactionDTO.KeyCode);
 
             var startedByUser = await _context.Users.FindAsync(startedByUserId);
             if (startedByUser == null)
@@ -53,7 +53,7 @@ namespace KeyManagement.Api.Services
             int endedByUserId)
         {
             var user = await FindUserAsync(keyTransactionDTO);
-            var key = await FindKeyAsync(keyTransactionDTO.KeyId);
+            var key = await FindKeyAsync(keyTransactionDTO.KeyCode);
 
             var keyTransaction = await _context.KeyTransactions
                 .Include(t => t.User)
@@ -104,9 +104,11 @@ namespace KeyManagement.Api.Services
             return user;
         }
 
-        private async Task<Key> FindKeyAsync(int keyId)
+        private async Task<Key> FindKeyAsync(string keyCode)
         {
-            var key = await _context.Keys.FindAsync(keyId);
+            var normalizedKeyCode = keyCode.Trim();
+            var key = await _context.Keys
+                .FirstOrDefaultAsync(k => k.Code == normalizedKeyCode);
 
             if (key == null)
             {

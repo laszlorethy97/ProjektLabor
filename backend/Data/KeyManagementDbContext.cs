@@ -52,6 +52,10 @@ namespace KeyManagement.Api.Data
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Key>()
+                .HasIndex(k => k.Code)
+                .IsUnique();
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedBy)
                 .WithMany()
