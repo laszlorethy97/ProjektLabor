@@ -128,3 +128,7 @@ $accent: #2f55d4;
   font-size: utils.rem(14);
   line-height: 1.5;
 }
+
+.ticket__status--error {
+  color: #b42318;
+}

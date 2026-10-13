@@ -45,6 +45,18 @@ $accent: #2f55d4;
   color: $ink-soft;
 }
 
+.janitor__success {
+  max-width: utils.rem(960);
+  margin: 0 auto utils.rem(24);
+  padding: utils.rem(12) utils.rem(16);
+  border: utils.rem(1) solid #a6f4c5;
+  border-radius: utils.rem(10);
+  background-color: #ecfdf3;
+  color: #067647;
+  font-size: utils.rem(14);
+  line-height: 1.5;
+}
+
 .janitor__actions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, utils.rem(240)), 1fr));

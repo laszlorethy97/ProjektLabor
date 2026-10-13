@@ -12,7 +12,7 @@
         id="ticket-description"
         name="description"
         [(ngModel)]="description"
-        (ngModelChange)="mockDto = null"
+        (ngModelChange)="onDescriptionChange()"
         rows="7"
         maxlength="2000"
         placeholder="Például: A terem projektora nem kapcsol be."
@@ -21,14 +21,16 @@
       <p class="ticket__hint">Legfeljebb 2000 karakter.</p>
     </div>
 
-    <button class="ticket__submit" type="submit" [disabled]="ticketForm.invalid || !description.trim()">
-      Hibajegy beküldése
+    <button
+      class="ticket__submit"
+      type="submit"
+      [disabled]="ticketForm.invalid || !description.trim() || isSubmitting"
+    >
+      {{ isSubmitting ? 'Beküldés…' : 'Hibajegy beküldése' }}
     </button>
 
-    @if (mockDto) {
-      <p class="ticket__status" role="status">
-        A hibajegy adatai elő vannak készítve. A beküldés szolgáltatása még nincs csatlakoztatva.
-      </p>
+    @if (errorMessage) {
+      <p class="ticket__status ticket__status--error" role="alert">{{ errorMessage }}</p>
     }
   </form>
 </main>
