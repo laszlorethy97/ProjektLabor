@@ -36,6 +36,7 @@ namespace KeyManagement.Api.Services
                 PinCode = dto.PinCode,
                 StartedAt = DateTime.UtcNow,
                 StartedByUser = startedByUser,
+                ApprovedByUser = startedByUser,
                 User = user
             };
 
