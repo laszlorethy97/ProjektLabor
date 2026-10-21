@@ -1,1 +1,70 @@
-<p>master-key-component works!</p>
+<main class="key-access">
+  <header class="key-access__header">
+    <h1 class="key-access__title">Masterkey átvétele</h1>
+    <p class="key-access__subtitle">
+      Add meg az email-címedet, a PIN-kódot és az átvenni kívánt masterkey azonosítóját.
+    </p>
+  </header>
+
+  <form class="key-access__form" #pickupForm="ngForm" (ngSubmit)="submit()">
+    <div class="key-access__field">
+      <label class="key-access__label" for="masterkey-pickup-email">Email</label>
+      <input
+        class="key-access__input"
+        id="masterkey-pickup-email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="masterkey-pickup-pin-code">PIN-kód</label>
+      <input
+        class="key-access__input"
+        id="masterkey-pickup-pin-code"
+        type="text"
+        name="pinCode"
+        [(ngModel)]="pinCode"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="masterkey-pickup-id">Masterkey-azonosító</label>
+      <input
+        class="key-access__input"
+        id="masterkey-pickup-id"
+        type="number"
+        name="masterKeyId"
+        [(ngModel)]="masterKeyId"
+        min="1"
+        step="1"
+        required
+      />
+    </div>
+
+    <button class="key-access__submit" type="submit" [disabled]="pickupForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Küldés...' : 'Masterkey átvétele' }}
+    </button>
+
+    @if (isSubmitting) {
+      <p class="key-access__pending" role="status" aria-live="polite">
+        A masterkey átvétele folyamatban van, várj a visszajelzésre.
+      </p>
+    }
+
+    @if (isSubmitted) {
+      <p class="key-access__success" role="status">A masterkey átvétele sikeres.</p>
+    }
+
+    @if (errorMessage) {
+      <p class="key-access__error" role="alert">{{ errorMessage }}</p>
+    }
+  </form>
+</main>

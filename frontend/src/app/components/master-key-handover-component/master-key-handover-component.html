@@ -1,1 +1,70 @@
-<p>master-key-handover-component works!</p>
+<main class="key-access">
+  <header class="key-access__header">
+    <h1 class="key-access__title">Masterkey leadása</h1>
+    <p class="key-access__subtitle">
+      Add meg az email-címedet, a PIN-kódot és a leadni kívánt masterkey azonosítóját.
+    </p>
+  </header>
+
+  <form class="key-access__form" #handoverForm="ngForm" (ngSubmit)="submit()">
+    <div class="key-access__field">
+      <label class="key-access__label" for="masterkey-handover-email">Email</label>
+      <input
+        class="key-access__input"
+        id="masterkey-handover-email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="masterkey-handover-pin-code">PIN-kód</label>
+      <input
+        class="key-access__input"
+        id="masterkey-handover-pin-code"
+        type="text"
+        name="pinCode"
+        [(ngModel)]="pinCode"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        required
+      />
+    </div>
+
+    <div class="key-access__field">
+      <label class="key-access__label" for="masterkey-handover-id">Masterkey-azonosító</label>
+      <input
+        class="key-access__input"
+        id="masterkey-handover-id"
+        type="number"
+        name="masterKeyId"
+        [(ngModel)]="masterKeyId"
+        min="1"
+        step="1"
+        required
+      />
+    </div>
+
+    <button class="key-access__submit" type="submit" [disabled]="handoverForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Küldés...' : 'Masterkey leadása' }}
+    </button>
+
+    @if (isSubmitting) {
+      <p class="key-access__pending" role="status" aria-live="polite">
+        A masterkey leadása folyamatban van, várj a visszajelzésre.
+      </p>
+    }
+
+    @if (isSubmitted) {
+      <p class="key-access__success" role="status">A masterkey leadása sikeresen rögzítve.</p>
+    }
+
+    @if (errorMessage) {
+      <p class="key-access__error" role="alert">{{ errorMessage }}</p>
+    }
+  </form>
+</main>

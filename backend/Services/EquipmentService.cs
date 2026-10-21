@@ -1,5 +1,6 @@
 using KeyManagement.Api.Data;
-using KeyManagement.Api.Models.Entities;
+using KeyManagement.Api.DTO;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace KeyManagement.Api.Services
@@ -13,16 +14,15 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<List<Equipment>> GetAllAsync()
+        public async Task<List<EquipmentDTO>> GetEquipmentsByRoomId(int roomId)
         {
-            return await _context.Equipments.ToListAsync();
-        }
-
-        public async Task<List<Equipment>> GetEquipmentsByRoomId(int roomId)
-        {
-            return await _context
-                .Equipments
+            return await _context.Equipments
                 .Where(e => e.Room.Id == roomId)
+                .Select(e => new EquipmentDTO
+                {
+                    Id = e.Id,
+                    Name = e.Name
+                })
                 .ToListAsync();
         }
     }
