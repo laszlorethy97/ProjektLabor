@@ -1,0 +1,38 @@
+<main class="masterkey-page">
+  <div class="masterkey-page__content">
+    <header class="masterkey-page__header">
+      <a class="masterkey-page__back" routerLink="/admin">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="masterkey-page__eyebrow">
+        <span class="masterkey-page__mark" aria-hidden="true"></span>
+        KULCSNYILVÁNTARTÁS
+      </div>
+      <h1 class="masterkey-page__title">Új mesterkulcs létrehozása</h1>
+      <p class="masterkey-page__subtitle">
+        Új mesterkulcs létrehozásához nyomd meg a plusz gombot.
+      </p>
+    </header>
+
+    <section class="masterkey-card" aria-labelledby="masterkey-card-title">
+      <div class="masterkey-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="8" cy="8" r="3.25"></circle>
+          <circle cx="16" cy="16" r="3.25"></circle>
+          <path d="m10.5 10.5 3.2 3.2M11 7h6m-2 0v2m2-2v2"></path>
+        </svg>
+      </div>
+      <h2 id="masterkey-card-title" class="masterkey-card__title">Mesterkulcs</h2>
+      <button class="masterkey-card__button" type="button" (click)="createMasterKey()">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14m-7-7h14"></path>
+        </svg>
+        Mesterkulcs létrehozása
+      </button>
+      <p class="masterkey-card__status" role="status">{{ statusMessage }}</p>
+    </section>
+  </div>
+</main>

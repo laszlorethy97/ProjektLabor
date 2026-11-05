@@ -1,0 +1,107 @@
+<main class="role-assignment">
+  <div class="role-assignment__content">
+    <header class="role-assignment__header">
+      <a class="role-assignment__back" routerLink="/admin" aria-label="Vissza az adminisztrációhoz">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="role-assignment__eyebrow">
+        <span class="role-assignment__eyebrow-mark" aria-hidden="true"></span>
+        FELHASZNÁLÓI HOZZÁFÉRÉS
+      </div>
+      <h1 class="role-assignment__title">Szerepkörök hozzárendelése</h1>
+      <p class="role-assignment__subtitle">
+        Válaszd ki a felhasználót, majd jelöld meg a hozzá rendelendő szerepköröket.
+      </p>
+    </header>
+
+    <form class="role-assignment__form" #roleForm="ngForm" (ngSubmit)="requestData()">
+      <section class="role-assignment__section" aria-labelledby="user-section-title">
+        <div class="role-assignment__section-heading">
+          <span class="role-assignment__step">01</span>
+          <div>
+            <h2 id="user-section-title" class="role-assignment__section-title">Felhasználó</h2>
+            <p class="role-assignment__section-description">
+              Add meg annak a felhasználónak az azonosítóját, akinek a szerepköröket adod.
+            </p>
+          </div>
+        </div>
+
+        <div class="role-assignment__field">
+          <label class="role-assignment__label" for="user-id">Felhasználói azonosító</label>
+          <div class="role-assignment__input-wrap">
+            <svg class="role-assignment__input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.25"></circle>
+              <path d="M5.5 20v-1.6a6.5 6.5 0 0 1 13 0V20z"></path>
+            </svg>
+            <input
+              class="role-assignment__input"
+              id="user-id"
+              name="userId"
+              type="number"
+              min="1"
+              step="1"
+              required
+              list="user-id-options"
+              placeholder="Például: 1"
+              autocomplete="off"
+              aria-describedby="user-id-hint"
+              [(ngModel)]="formData.userId"
+            />
+            <datalist id="user-id-options">
+              @for (userId of availableUserIds; track userId) {
+                <option [value]="userId">Felhasználó {{ userId }}</option>
+              }
+            </datalist>
+          </div>
+          <span class="role-assignment__hint" id="user-id-hint">
+            Válassz a listából, vagy írj be egy legalább 1-es egész számot.
+          </span>
+        </div>
+      </section>
+
+      <div class="role-assignment__divider" aria-hidden="true"></div>
+
+      <section class="role-assignment__section" aria-labelledby="roles-section-title">
+        <div class="role-assignment__section-heading">
+          <span class="role-assignment__step">02</span>
+          <div>
+            <h2 id="roles-section-title" class="role-assignment__section-title">Szerepkörök</h2>
+            <p class="role-assignment__section-description">
+              Egy felhasználóhoz több szerepkör is kijelölhető.
+            </p>
+          </div>
+        </div>
+
+        <div class="role-assignment__roles">
+          @for (role of roleOptions; track role.key) {
+            <label class="admin-role-option" [for]="'role-' + role.key">
+              <input
+                class="admin-role-option__checkbox"
+                [id]="'role-' + role.key"
+                [name]="'role-' + role.key"
+                type="checkbox"
+                [(ngModel)]="formData.roles[role.key]"
+              />
+              <span class="admin-role-option__body">
+                <span class="admin-role-option__title">{{ role.label }}</span>
+                <span class="admin-role-option__description">{{ role.description }}</span>
+              </span>
+            </label>
+          }
+        </div>
+      </section>
+
+      <footer class="role-assignment__footer admin-form-footer">
+        <p class="admin-form-status" [class.admin-form-status--error]="statusIsError" role="status">
+          {{ statusMessage }}
+        </p>
+        <button class="admin-form-submit" type="submit" [disabled]="roleForm.invalid">
+          Szerepkörök bekérése
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>

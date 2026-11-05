@@ -1,0 +1,226 @@
+:host {
+  display: block;
+  min-height: 100%;
+  color: #17243b;
+  font-family: 'Inter', sans-serif;
+}
+
+.admin-dashboard {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(2rem, 6vw, 5rem) 1.25rem 2rem;
+  background:
+    radial-gradient(ellipse at 50% -18%, rgba(201, 218, 249, 0.6), transparent 55%),
+    #f5f7fb;
+}
+
+.admin-dashboard__content {
+  width: min(100%, 58rem);
+  margin: 0 auto;
+}
+
+.admin-dashboard__header {
+  margin-bottom: 2rem;
+}
+
+.admin-dashboard__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+  color: #526687;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.admin-dashboard__eyebrow-mark,
+.admin-dashboard__footer-mark {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #5278bd;
+  box-shadow: 0 0 0 0.25rem #e2eafa;
+}
+
+.admin-dashboard__title {
+  color: #17243b;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+
+.admin-dashboard__subtitle {
+  max-width: 37rem;
+  margin-top: 0.8rem;
+  color: #68758a;
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+.admin-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.8rem;
+}
+
+.admin-action {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) 2rem;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid #e1e7f0;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.94);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(23, 36, 59, 0.035);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: #b7c8e5;
+    box-shadow: 0 10px 24px rgba(23, 36, 59, 0.09);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(82, 120, 189, 0.35);
+    outline-offset: 3px;
+  }
+}
+
+.admin-action__icon {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border: 1px solid #e1e9f6;
+  border-radius: 0.85rem;
+  background: #f0f4fb;
+  color: #456ba9;
+
+  svg {
+    width: 1.55rem;
+    height: 1.55rem;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.6;
+  }
+}
+
+.admin-action__body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.admin-action__meta {
+  margin-bottom: 0.35rem;
+  color: #8390a4;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.admin-action__title {
+  color: #1d2b43;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.admin-action__description {
+  margin-top: 0.25rem;
+  color: #748096;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.admin-action__arrow {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #f3f6fb;
+  color: #7487a7;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+  }
+}
+
+.admin-action:hover .admin-action__arrow {
+  transform: translateX(2px);
+  background: #e8eef8;
+  color: #456ba9;
+}
+
+.admin-dashboard__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.6rem;
+  color: #8792a4;
+  font-size: 0.75rem;
+}
+
+.admin-dashboard__footer-mark {
+  width: 0.4rem;
+  height: 0.4rem;
+  box-shadow: none;
+}
+
+.admin-dashboard__footer-count {
+  margin-left: auto;
+}
+
+@media (max-width: 30rem) {
+  .admin-dashboard {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .admin-action {
+    grid-template-columns: 2.8rem minmax(0, 1fr) 1.5rem;
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+
+  .admin-action__icon {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .admin-action__description {
+    font-size: 0.78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
