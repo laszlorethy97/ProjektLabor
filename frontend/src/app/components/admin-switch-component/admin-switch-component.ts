@@ -5,7 +5,7 @@ interface AdminAction {
   title: string;
   description: string;
   route: string;
-  icon: 'user' | 'role' | 'key' | 'masterkey' | 'room' | 'maintenance';
+  icon: 'user' | 'role' | 'key' | 'masterkey' | 'permission' | 'room' | 'maintenance';
 }
 
 const ADMIN_ACTIONS: AdminAction[] = [
@@ -32,6 +32,12 @@ const ADMIN_ACTIONS: AdminAction[] = [
     description: 'Mesterkulcs adatainak rögzítése és kezelése.',
     route: '/admin/create-masterkey',
     icon: 'masterkey',
+  },
+  {
+    title: 'Mesterkulcs-használati engedély',
+    description: 'Engedélyezd egy felhasználónak egy mesterkulcs felvételét.',
+    route: '/admin/create-permission',
+    icon: 'permission',
   },
   {
     title: 'Új terem létrehozása',

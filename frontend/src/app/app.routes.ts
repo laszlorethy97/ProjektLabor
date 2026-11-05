@@ -20,6 +20,7 @@ import { AdminCreateMasterkeyComponent } from './components/admin-create-masterk
 import { AdminCreateRoomComponent } from './components/admin-create-room-component/admin-create-room-component';
 import { AdminRoomlistComponent } from './components/admin-roomlist-component/admin-roomlist-component';
 import { AdminCreateMaintanceComponent } from './components/admin-create-maintance-component/admin-create-maintance-component';
+import { AdminCreatePermissionComponent } from './components/admin-create-permission-component/admin-create-permission-component';
 
 export const routes: Routes = [{
     component: CommonComponent,
@@ -117,6 +118,14 @@ export const routes: Routes = [{
         {
             component: AdminAddRoleComponent,
             path: 'admin/add-role',
+            canActivate: [authGuard, roleGuard],
+            data: {
+                roles: ['admin']
+            }
+        },
+        {
+            component: AdminCreatePermissionComponent,
+            path: 'admin/create-permission',
             canActivate: [authGuard, roleGuard],
             data: {
                 roles: ['admin']

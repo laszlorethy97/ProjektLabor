@@ -22,7 +22,7 @@ describe('AdminSwitchComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show all six admin actions with their destination routes', () => {
+  it('should show all seven admin actions with their destination routes', () => {
     fixture.detectChanges();
 
     const links = Array.from(
@@ -35,6 +35,7 @@ describe('AdminSwitchComponent', () => {
       '/admin/add-role',
       '/admin/create-key',
       '/admin/create-masterkey',
+      '/admin/create-permission',
       '/admin/create-room',
       '/admin/maintenance',
     ]);

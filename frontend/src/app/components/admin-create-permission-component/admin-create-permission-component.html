@@ -1,1 +1,95 @@
-<p>admin-create-permission-component works!</p>
+<main class="permission-page">
+  <div class="permission-page__content">
+    <header class="permission-page__header">
+      <a class="permission-page__back" routerLink="/admin" aria-label="Vissza az adminisztrációhoz">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="permission-page__eyebrow">
+        <span class="permission-page__mark" aria-hidden="true"></span>
+        HOZZÁFÉRÉSEK KEZELÉSE
+      </div>
+      <h1 class="permission-page__title">Mesterkulcs-használati engedély</h1>
+      <p class="permission-page__subtitle">
+        Add meg, melyik felhasználó melyik mesterkulcsot veheti fel.
+      </p>
+    </header>
+
+    <form class="permission-card" #permissionForm="ngForm" (ngSubmit)="createPermission()">
+      <div class="permission-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 3 19 6v5.2c0 4.5-2.9 7.7-7 9.8-4.1-2.1-7-5.3-7-9.8V6z"></path>
+          <path d="M12 8v7m-3.5-3.5h7"></path>
+        </svg>
+      </div>
+      <h2 class="permission-card__title">Engedélyezett hozzáférés</h2>
+      <p class="permission-card__description">
+        Az azonosítókat a rendszerben szereplő felhasználóhoz és mesterkulcshoz add meg.
+      </p>
+
+      <div class="permission-card__fields">
+        <div class="permission-card__field">
+          <label class="permission-card__label" for="permission-user-id">Felhasználó azonosítója</label>
+          <input
+            class="permission-card__input"
+            id="permission-user-id"
+            name="userId"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            placeholder="Például: 12"
+            required
+            [ngModel]="userId()"
+            (ngModelChange)="userId.set($event)"
+          />
+          <span class="permission-card__hint">A felhasználó egyedi ID-ja.</span>
+        </div>
+
+        <div class="permission-card__field">
+          <label class="permission-card__label" for="permission-masterkey-id">
+            Mesterkulcs azonosítója
+          </label>
+          <input
+            class="permission-card__input"
+            id="permission-masterkey-id"
+            name="masterKeyId"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            placeholder="Például: 3"
+            required
+            [ngModel]="masterKeyId()"
+            (ngModelChange)="masterKeyId.set($event)"
+          />
+          <span class="permission-card__hint">A felvenni kívánt mesterkulcs egyedi ID-ja.</span>
+        </div>
+      </div>
+
+      <footer class="permission-card__footer">
+        <p
+          class="permission-card__status"
+          [class.permission-card__status--error]="statusIsError()"
+          role="status"
+          aria-live="polite"
+        >
+          {{ statusMessage() }}
+        </p>
+        <button
+          class="permission-card__submit"
+          type="submit"
+          [disabled]="permissionForm.invalid || isSaving()"
+        >
+          @if (isSaving()) {
+            Engedély mentése…
+          } @else {
+            Engedély megadása
+          }
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>
