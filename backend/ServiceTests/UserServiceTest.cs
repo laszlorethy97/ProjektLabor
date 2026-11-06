@@ -43,7 +43,14 @@ namespace KeyManagement.Api.ServiceTests
             using var context = _GetDbContext();
             var service = new UserService(context);
 
-            var user1 = new User { Id = 1, Email = "john.doe@example.com", PasswordHash = "password123" };
+            var user1 = new User
+            {
+                Id = 1,
+                Email = "john.doe@example.com"
+            };
+
+            var passwordHasher = new PasswordHasher<User>();
+            user1.PasswordHash = passwordHasher.HashPassword(user1, "password123");
             var role1 = new Role { Id = 1, Type = "Admin" };
             var userRole = new UserRole { Id = 1, User=user1, Role=role1 };
 
@@ -90,7 +97,14 @@ namespace KeyManagement.Api.ServiceTests
             using var context = _GetDbContext();
             var service = new UserService(context);
 
-            var user1 = new User { Id = 1, Email = "john.doe@example.com", PasswordHash = "password123" };
+           var user1 = new User
+            {
+                Id = 1,
+                Email = "john.doe@example.com"
+            };
+
+            var passwordHasher = new PasswordHasher<User>();
+            user1.PasswordHash = passwordHasher.HashPassword(user1, "password123");
             var role1 = new Role { Id = 1, Type = "Admin" };
             var userRole = new UserRole { Id = 1, User=user1, Role=role1 };
 
