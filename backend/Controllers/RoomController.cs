@@ -26,4 +26,19 @@ public class RoomController : ControllerBase
     {
         return Ok(await _service.GetRoomsByBuildingAsync());
     }
+
+    [HttpPost("schedule")]
+    [Authorize]
+    public async Task<ActionResult<RoomScheduleDTO>> GetRoomScheduleAsync(
+        RoomScheduleRequestDTO dto)
+    {
+        var result = await _service.GetRoomScheduleAsync(dto.RoomId);
+
+        if (result == null)
+        {
+            return NotFound(new { message = "Room not found." });
+        }
+
+        return Ok(result);
+    }
 }

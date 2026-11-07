@@ -30,5 +30,37 @@ namespace KeyManagement.Api.Services
                 })
                 .ToListAsync();
         }
+
+        public async Task<RoomScheduleDTO?> GetRoomScheduleAsync(int roomId)
+        {
+            Room? room = await _context.Rooms
+                .Include(r => r.Reservations)
+                .Include(r => r.Maintenances)
+                .FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if (room == null)
+            {
+                return null;
+            }
+
+            return new RoomScheduleDTO
+            {
+                Reservations = room.Reservations
+                    .Select(r => new TimeIntervalDTO
+                    {
+                        StartTime = r.StartTime,
+                        EndTime = r.EndTime
+                    })
+                    .ToList(),
+
+                Maintenances = room.Maintenances
+                    .Select(m => new TimeIntervalDTO
+                    {
+                        StartTime = m.StartTime,
+                        EndTime = m.EndTime
+                    })
+                    .ToList()
+            };
+        }
     }
 }
