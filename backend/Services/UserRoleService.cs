@@ -70,7 +70,7 @@ namespace KeyManagement.Api.Services
                 .Where(ur => !roleIds.Contains(ur.Role.Id))
                 .ToList();
 
-            if (userRolesToRemove.Any())
+            if (userRolesToRemove.Count > 0)
             {
                 _context.UserRoles.RemoveRange(userRolesToRemove);
             }
@@ -92,14 +92,13 @@ namespace KeyManagement.Api.Services
                 newUserRoles.Add(newUserRole);
             }
 
-            if (newUserRoles.Any())
+            if (newUserRoles.Count > 0)
             {
                 await _context.UserRoles.AddRangeAsync(newUserRoles);
             }
 
             await _context.SaveChangesAsync();
-
-             return await _context.UserRoles
+            return await _context.UserRoles
                 .Include(ur => ur.Role)
                 .Where(ur => ur.User.Id == userId)
                 .ToListAsync();

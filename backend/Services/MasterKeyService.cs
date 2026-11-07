@@ -12,7 +12,32 @@ namespace KeyManagement.Api.Services
         {
             _context = context;
         }
+        
+        public async Task<List<MasterKey>> GetMasterKeysAsync()
+        {
+            return await _context.MasterKeys.ToListAsync();
+        }
 
+        public async Task<MasterKey> CreateMasterKeyAsync(int createdByUserId)
+        {
+            var createdByUser = await _context.Users.FindAsync(createdByUserId);
+            
+            if (createdByUser == null)
+            {
+                throw new KeyNotFoundException("The Creator User was not found.");
+            }
 
+            var newMasterKey = new MasterKey
+            {
+                CreatedBy = createdByUser
+            };
+
+            _context.MasterKeyTransactions = null;
+            
+            _context.MasterKeys.Add(newMasterKey);
+            await _context.SaveChangesAsync();
+
+            return newMasterKey;
+        }
     }
 }
