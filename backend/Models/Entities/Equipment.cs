@@ -14,3 +14,5 @@ namespace KeyManagement.Api.Models.Entities
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }
+
+

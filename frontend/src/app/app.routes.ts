@@ -21,6 +21,7 @@ import { AdminCreateRoomComponent } from './components/admin-create-room-compone
 import { AdminRoomlistComponent } from './components/admin-roomlist-component/admin-roomlist-component';
 import { AdminCreateMaintanceComponent } from './components/admin-create-maintance-component/admin-create-maintance-component';
 import { AdminCreatePermissionComponent } from './components/admin-create-permission-component/admin-create-permission-component';
+import { AdminAddEquipmentComponent } from './components/admin-add-equipment-component/admin-add-equipment-component';
 
 export const routes: Routes = [{
     component: CommonComponent,
@@ -150,6 +151,14 @@ export const routes: Routes = [{
         {
             component: AdminCreateRoomComponent,
             path: 'admin/create-room',
+            canActivate: [authGuard, roleGuard],
+            data: {
+                roles: ['admin']
+            }
+        },
+        {
+            component: AdminAddEquipmentComponent,
+            path: 'admin/add-equipment',
             canActivate: [authGuard, roleGuard],
             data: {
                 roles: ['admin']

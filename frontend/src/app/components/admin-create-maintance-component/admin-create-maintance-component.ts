@@ -19,13 +19,13 @@ export class AdminCreateMaintanceComponent {
 
   requestMaintenance(): void {
     if (!this.startDate || !this.endDate) {
-      this.statusMessage = 'Add meg a karbantartás kezdő és záró dátumát.';
+      this.statusMessage = 'Add meg a karbantartás kezdő és záró időpontját.';
       this.statusIsError = true;
       return;
     }
 
     if (this.startDate > this.endDate) {
-      this.statusMessage = 'A záró dátum nem lehet korábbi a kezdő dátumnál.';
+      this.statusMessage = 'A záró időpont nem lehet korábbi a kezdő időpontnál.';
       this.statusIsError = true;
       return;
     }

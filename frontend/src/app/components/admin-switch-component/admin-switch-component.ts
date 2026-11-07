@@ -5,7 +5,7 @@ interface AdminAction {
   title: string;
   description: string;
   route: string;
-  icon: 'user' | 'role' | 'key' | 'masterkey' | 'permission' | 'room' | 'maintenance';
+  icon: 'user' | 'role' | 'key' | 'masterkey' | 'permission' | 'room' | 'maintenance' | 'equipment';
 }
 
 const ADMIN_ACTIONS: AdminAction[] = [
@@ -44,6 +44,12 @@ const ADMIN_ACTIONS: AdminAction[] = [
     description: 'Teremadatok, befogadóképesség és felszerelések rögzítése.',
     route: '/admin/create-room',
     icon: 'room',
+  },
+  {
+    title: 'Felszerelési igény hozzáadása',
+    description: 'Kért felszerelések felsorolása egy terem azonosítója alapján.',
+    route: '/admin/add-equipment',
+    icon: 'equipment',
   },
   {
     title: 'Karbantartás meghirdetése',

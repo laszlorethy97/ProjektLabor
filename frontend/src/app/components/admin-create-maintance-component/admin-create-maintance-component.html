@@ -27,19 +27,20 @@
               Karbantartás időszaka
             </h2>
             <p class="maintenance-form__section-description">
-              A kezdő és záró dátumot is add meg.
+              A kezdő és záró dátumot és időpontot is add meg.
             </p>
           </div>
         </div>
 
         <div class="maintenance-form__fields">
           <div class="maintenance-form__field">
-            <label class="maintenance-form__label" for="start-date">Kezdő dátum *</label>
+            <label class="maintenance-form__label" for="start-date">Kezdő időpont *</label>
             <input
               class="maintenance-form__input"
               id="start-date"
               name="startDate"
-              type="date"
+              type="datetime-local"
+              step="60"
               required
               [max]="endDate || null"
               [(ngModel)]="startDate"
@@ -47,12 +48,13 @@
           </div>
 
           <div class="maintenance-form__field">
-            <label class="maintenance-form__label" for="end-date">Záró dátum *</label>
+            <label class="maintenance-form__label" for="end-date">Záró időpont *</label>
             <input
               class="maintenance-form__input"
               id="end-date"
               name="endDate"
-              type="date"
+              type="datetime-local"
+              step="60"
               required
               [min]="startDate || null"
               [(ngModel)]="endDate"
