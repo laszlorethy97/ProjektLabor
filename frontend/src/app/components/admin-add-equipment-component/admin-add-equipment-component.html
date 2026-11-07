@@ -1,0 +1,95 @@
+<main class="equipment-page">
+  <div class="equipment-page__content">
+    <header class="equipment-page__header">
+      <a class="equipment-page__back" routerLink="/admin" aria-label="Vissza az adminisztrációhoz">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="equipment-page__eyebrow">
+        <span class="equipment-page__mark" aria-hidden="true"></span>
+        TEREMNYILVÁNTARTÁS
+      </div>
+      <h1 class="equipment-page__title">Felszerelési igény hozzáadása</h1>
+      <p class="equipment-page__subtitle">
+        Add meg a terem azonosítóját, majd sorold fel vesszővel elválasztva a kért felszereléseket.
+      </p>
+    </header>
+
+    <form class="equipment-card" #equipmentForm="ngForm" (ngSubmit)="requestData()">
+      <div class="equipment-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"></path>
+          <path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21m-4-15.9 8 4.5"></path>
+        </svg>
+      </div>
+      <h2 class="equipment-card__title">Kért felszerelések</h2>
+      <p class="equipment-card__description">
+        A felsorolás minden eleme a megadott teremhez tartozó igényként jelenik meg.
+      </p>
+
+      <div class="equipment-card__fields">
+        <div class="equipment-card__field">
+          <label class="equipment-card__label" for="equipment-room-id">Terem azonosítója *</label>
+          <input
+            class="equipment-card__input"
+            id="equipment-room-id"
+            name="roomId"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            placeholder="Például: 7"
+            required
+            [(ngModel)]="formData.roomId"
+          />
+          <span class="equipment-card__hint">Annak a teremnek az egyedi ID-ja, amelyhez az igény tartozik.</span>
+        </div>
+
+        <div class="equipment-card__field">
+          <label class="equipment-card__label" for="equipment-list">Felszerelések *</label>
+          <textarea
+            class="equipment-card__input equipment-card__input--textarea"
+            id="equipment-list"
+            name="equipment"
+            rows="3"
+            placeholder="Például: projektor, tábla, számítógép"
+            aria-describedby="equipment-hint"
+            required
+            [ngModel]="equipmentInput"
+            (ngModelChange)="updateEquipment($event)"
+          ></textarea>
+          <span class="equipment-card__hint" id="equipment-hint">
+            Több elemet vesszővel elválasztva adj meg.
+          </span>
+        </div>
+      </div>
+
+      @if (formData.equipment.length > 0) {
+        <section class="equipment-card__preview" aria-label="Felszerelések listája">
+          <h3 class="equipment-card__preview-title">Felszerelések ({{ formData.equipment.length }})</h3>
+          <ul class="equipment-card__list">
+            @for (item of formData.equipment; track $index) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </section>
+      }
+
+      <footer class="equipment-card__footer">
+        <p
+          class="equipment-card__status"
+          [class.equipment-card__status--error]="statusIsError"
+          role="status"
+          aria-live="polite"
+        >
+          {{ statusMessage }}
+        </p>
+        <button class="equipment-card__submit" type="submit" [disabled]="equipmentForm.invalid">
+          Igény adatainak bekérése
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>
