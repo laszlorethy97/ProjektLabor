@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  min-height: 100%;
+  color: #0f172a;
+  font-family: 'Inter', sans-serif;
+}
+
+.admin-roomlist {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(1.5rem, 5vw, 4rem) 1rem 2.5rem;
+  background: #f4f6fb;
+}
+
+.admin-roomlist__header {
+  max-width: 40rem;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.admin-roomlist__eyebrow {
+  color: #526687;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.admin-roomlist__title {
+  margin-top: 0.55rem;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-roomlist__subtitle {
+  margin-top: 0.6rem;
+  color: #5b6478;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.admin-roomlist__list {
+  display: flex;
+  max-width: 45rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-roomlist__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #dfe3ec;
+  border-radius: 0.875rem;
+  background: #fff;
+  box-shadow: 0 8px 20px #0f172a0d;
+
+  @media (max-width: 34rem) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+.admin-roomlist__info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-roomlist__building,
+.admin-roomlist__capacity {
+  color: #5b6478;
+  font-size: 0.8rem;
+}
+
+.admin-roomlist__room {
+  font-size: 1.05rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.admin-roomlist__button,
+.admin-roomlist__retry {
+  flex: 0 0 auto;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 0.625rem;
+  background: #2f55d4;
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #2648ba;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #2f55d466;
+    outline-offset: 2px;
+  }
+}
+
+.admin-roomlist__message {
+  max-width: 45rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  color: #5b6478;
+  text-align: center;
+}
+
+.admin-roomlist__message--error {
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+  color: #9c2c2c;
+}

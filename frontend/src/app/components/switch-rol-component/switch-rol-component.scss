@@ -80,6 +80,8 @@ $icon-bg: #e8ecf7;
   border-radius: utils.rem(18);
   background-color: $surface;
   box-shadow: 0 utils.rem(14) utils.rem(32) rgba($ink, 0.06);
+  color: inherit;
+  text-decoration: none;
 
   @include utils.media-max($bp-sm) {
     padding: utils.rem(18);

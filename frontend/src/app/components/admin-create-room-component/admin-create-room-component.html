@@ -1,0 +1,105 @@
+<main class="room-form">
+  <div class="room-form__content">
+    <header class="room-form__header">
+      <a class="room-form__back" routerLink="/admin">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="room-form__eyebrow">
+        <span class="room-form__mark" aria-hidden="true"></span>
+        TEREMNYILVÁNTARTÁS
+      </div>
+      <h1 class="room-form__title">Új terem létrehozása</h1>
+      <p class="room-form__subtitle">
+        Add meg az épület és a terem adatait, valamint a rendelkezésre álló felszereléseket.
+      </p>
+    </header>
+
+    <form class="room-form__card" #roomForm="ngForm" (ngSubmit)="requestData()">
+      <section aria-labelledby="room-data-title">
+        <div class="room-form__section-heading">
+          <span class="room-form__step">01</span>
+          <div>
+            <h2 id="room-data-title" class="room-form__section-title">Terem adatai</h2>
+            <p class="room-form__section-description">
+              A csillaggal jelölt mezők kitöltése szükséges.
+            </p>
+          </div>
+        </div>
+
+        <div class="room-form__fields">
+          <div class="room-form__field">
+            <label class="room-form__label" for="building-id">Épületazonosító *</label>
+            <input
+              class="room-form__input"
+              id="building-id"
+              name="buildingId"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Például: 1"
+              required
+              [(ngModel)]="formData.buildingId"
+            />
+          </div>
+
+          <div class="room-form__field">
+            <label class="room-form__label" for="room-name">Terem neve *</label>
+            <input
+              class="room-form__input"
+              id="room-name"
+              name="roomName"
+              type="text"
+              placeholder="Például: 204-es terem"
+              autocomplete="off"
+              required
+              [(ngModel)]="formData.roomName"
+            />
+          </div>
+
+          <div class="room-form__field">
+            <label class="room-form__label" for="capacity">Befogadóképesség *</label>
+            <input
+              class="room-form__input"
+              id="capacity"
+              name="capacity"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Például: 30"
+              required
+              [(ngModel)]="formData.capacity"
+            />
+          </div>
+
+          <div class="room-form__field room-form__field--wide">
+            <label class="room-form__label" for="equipment">Felszerelések</label>
+            <input
+              class="room-form__input"
+              id="equipment"
+              name="equipment"
+              type="text"
+              placeholder="Például: projektor, tábla, számítógép"
+              autocomplete="off"
+              aria-describedby="equipment-hint"
+              [ngModel]="equipmentInput"
+              (ngModelChange)="updateEquipment($event)"
+            />
+            <span class="room-form__hint" id="equipment-hint">
+              Több felszerelést vesszővel elválasztva adj meg.
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <footer class="room-form__footer admin-form-footer">
+        <p class="room-form__status" role="status">{{ statusMessage }}</p>
+        <button class="admin-form-submit" type="submit" [disabled]="roomForm.invalid">
+          Terem adatainak bekérése
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>

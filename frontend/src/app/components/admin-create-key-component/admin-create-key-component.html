@@ -1,0 +1,82 @@
+<main class="key-form">
+  <div class="key-form__content">
+    <header class="key-form__header">
+      <a class="key-form__back" routerLink="/admin">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="key-form__eyebrow">
+        <span class="key-form__mark" aria-hidden="true"></span>
+        KULCSNYILVÁNTARTÁS
+      </div>
+      <h1 class="key-form__title">Új kulcs létrehozása</h1>
+      <p class="key-form__subtitle">
+        Add meg a kulcs kódját és azt a termet, amelyhez a kulcs tartozik.
+      </p>
+    </header>
+
+    <form class="key-form__card" #keyForm="ngForm" (ngSubmit)="requestData()">
+      <section class="key-form__section" aria-labelledby="key-data-title">
+        <div class="key-form__section-heading">
+          <span class="key-form__step">01</span>
+          <div>
+            <h2 id="key-data-title" class="key-form__section-title">Kulcs adatai</h2>
+            <p class="key-form__section-description">
+              Mindkét mező kézzel tölthető ki.
+            </p>
+          </div>
+        </div>
+
+        <div class="key-form__fields">
+          <div class="key-form__field">
+            <label class="key-form__label" for="keycode">Kulcskód</label>
+            <div class="key-form__input-wrap">
+              <svg class="key-form__input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="8.5" cy="10" r="4"></circle>
+                <path d="m11.5 13 7 7m-2-2 2-2m-5 5 2-2"></path>
+              </svg>
+              <input
+                class="key-form__input"
+                id="keycode"
+                name="keycode"
+                type="text"
+                placeholder="Például: K-101"
+                autocomplete="off"
+                required
+                [(ngModel)]="formData.keycode"
+              />
+            </div>
+          </div>
+
+          <div class="key-form__field">
+            <label class="key-form__label" for="roomname">Terem neve</label>
+            <div class="key-form__input-wrap">
+              <svg class="key-form__input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 20V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v15m-12 0h16m-4 0v-7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7M8 8h1m3 0h1M8 12h1m3 0h1m-5 8v-3h4v3"></path>
+              </svg>
+              <input
+                class="key-form__input"
+                id="roomname"
+                name="roomname"
+                type="text"
+                placeholder="Például: 204-es terem"
+                autocomplete="off"
+                required
+                [(ngModel)]="formData.roomname"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="key-form__footer admin-form-footer">
+        <p class="key-form__status" role="status">{{ statusMessage }}</p>
+        <button class="admin-form-submit" type="submit" [disabled]="keyForm.invalid">
+          Kulcs adatainak bekérése
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>

@@ -1,0 +1,125 @@
+<main class="user-form">
+  <div class="user-form__content">
+    <header class="user-form__header">
+      <a class="user-form__back" routerLink="/admin" aria-label="Vissza az adminisztrációhoz">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        Adminisztráció
+      </a>
+      <div class="user-form__eyebrow">
+        <span class="user-form__mark" aria-hidden="true"></span>
+        FELHASZNÁLÓI HOZZÁFÉRÉS
+      </div>
+      <h1 class="user-form__title">Felhasználó regisztrálása</h1>
+      <p class="user-form__subtitle">
+        Add meg a fiók adatait, majd válaszd ki a felhasználó szerepköreit.
+      </p>
+    </header>
+
+    <form class="user-form__card" #userForm="ngForm" (ngSubmit)="requestData()">
+      <section aria-labelledby="account-data-title">
+        <div class="user-form__section-heading">
+          <span class="user-form__step">01</span>
+          <div>
+            <h2 id="account-data-title" class="user-form__section-title">Fiók adatai</h2>
+            <p class="user-form__section-description">A regisztrációhoz szükséges adatok.</p>
+          </div>
+        </div>
+
+        <div class="user-form__fields">
+          <div class="user-form__field user-form__field--wide">
+            <label class="user-form__label" for="user-email">E-mail-cím *</label>
+            <input
+              class="user-form__input"
+              id="user-email"
+              name="email"
+              type="email"
+              placeholder="pelda@email.com"
+              autocomplete="email"
+              required
+              [(ngModel)]="formData.email"
+            />
+          </div>
+
+          <div class="user-form__field">
+            <label class="user-form__label" for="user-pin">PIN-kód *</label>
+            <input
+              class="user-form__input"
+              id="user-pin"
+              name="pinCode"
+              type="password"
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              maxlength="6"
+              placeholder="6 számjegy"
+              autocomplete="new-password"
+              required
+              [(ngModel)]="formData.pinCode"
+            />
+            <span class="user-form__hint">A PIN-kód pontosan 6 számjegyből álljon.</span>
+          </div>
+
+          <div class="user-form__field">
+            <label class="user-form__label" for="user-password">Jelszó *</label>
+            <input
+              class="user-form__input"
+              id="user-password"
+              name="password"
+              type="password"
+              placeholder="Adj meg egy jelszót"
+              autocomplete="new-password"
+              required
+              [(ngModel)]="formData.password"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div class="user-form__divider" aria-hidden="true"></div>
+
+      <section aria-labelledby="user-roles-title">
+        <div class="user-form__section-heading">
+          <span class="user-form__step">02</span>
+          <div>
+            <h2 id="user-roles-title" class="user-form__section-title">Szerepkörök</h2>
+            <p class="user-form__section-description">
+              Válassz legalább egy szerepkört. Több is megadható.
+            </p>
+          </div>
+        </div>
+
+        <div class="user-form__roles">
+          @for (role of roleOptions; track role.key) {
+            <label class="admin-role-option" [for]="'new-user-role-' + role.key">
+              <input
+                class="admin-role-option__checkbox"
+                [id]="'new-user-role-' + role.key"
+                [name]="'new-user-role-' + role.key"
+                type="checkbox"
+                [(ngModel)]="formData.roles[role.key]"
+              />
+              <span class="admin-role-option__body">
+                <span class="admin-role-option__title">{{ role.label }}</span>
+                <span class="admin-role-option__description">{{ role.description }}</span>
+              </span>
+            </label>
+          }
+        </div>
+      </section>
+
+      <footer class="user-form__footer admin-form-footer">
+        <p
+          class="admin-form-status"
+          [class.admin-form-status--error]="statusIsError"
+          role="status"
+        >
+          {{ statusMessage }}
+        </p>
+        <button class="admin-form-submit" type="submit" [disabled]="userForm.invalid">
+          Regisztrációs adatok bekérése
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>

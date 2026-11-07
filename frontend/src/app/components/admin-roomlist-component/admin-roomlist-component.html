@@ -1,0 +1,42 @@
+<main class="admin-roomlist">
+  <header class="admin-roomlist__header">
+    <span class="admin-roomlist__eyebrow">KARBANTARTÁS</span>
+    <h1 class="admin-roomlist__title">Terem kiválasztása</h1>
+    <p class="admin-roomlist__subtitle">
+      Válaszd ki azt a termet, amelyhez karbantartást szeretnél rögzíteni.
+    </p>
+  </header>
+
+  @if (isLoading()) {
+    <p class="admin-roomlist__message" role="status">Termek betöltése…</p>
+  } @else if (loadError()) {
+    <div class="admin-roomlist__message admin-roomlist__message--error" role="alert">
+      <p>Nem sikerült betölteni a termeket.</p>
+      <button class="admin-roomlist__retry" type="button" (click)="loadRooms()">Újrapróbálás</button>
+    </div>
+  } @else {
+    <ul class="admin-roomlist__list">
+      @for (room of rooms(); track room.roomId) {
+        <li
+          class="admin-roomlist__item"
+        >
+          <div class="admin-roomlist__info">
+            <span class="admin-roomlist__building">{{ room.buildingName }} épület</span>
+            <span class="admin-roomlist__room">{{ room.roomName }} terem</span>
+            <span class="admin-roomlist__capacity">Férőhely: {{ room.capacity }} fő</span>
+          </div>
+          <button
+            class="admin-roomlist__button"
+            type="button"
+            (click)="selectRoom(room)"
+          >
+            Karbantartás rögzítése
+          </button>
+        </li>
+      } @empty {
+        <li class="admin-roomlist__message">Nincs elérhető terem.</li>
+      }
+    </ul>
+
+  }
+</main>
