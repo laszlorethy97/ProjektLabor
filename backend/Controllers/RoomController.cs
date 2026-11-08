@@ -1,7 +1,7 @@
 using KeyManagement.Api.DTO;
 using KeyManagement.Api.Models.Entities;
 using KeyManagement.Api.Services;
-
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,5 +40,22 @@ public class RoomController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> CreateRoomAsync(CreateRoomDTO dto)
+    {
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId == null || !int.TryParse(userId, out int adminId))
+            return Unauthorized();
+
+        var result = await _service.CreateRoomAsync(dto, adminId);
+
+        if (!result.Success)
+            return BadRequest(new { message = result.Error });
+
+        return Ok(new { message = "Room created successfully." });
     }
 }

@@ -62,5 +62,50 @@ namespace KeyManagement.Api.Services
                     .ToList()
             };
         }
+
+        public async Task<(bool Success, string? Error)> CreateRoomAsync(
+            CreateRoomDTO dto, int userId)
+        {
+            Building? building = await _context.Buildings
+                .FirstOrDefaultAsync(b => b.Id == dto.BuildingId);
+
+            if (building == null)
+                return (false, "Building not found.");
+
+            User? user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return (false, "User not found.");
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return (false, "Room name cannot be empty.");
+
+            if (dto.Capacity <= 0)
+                return (false, "Capacity must be greater than zero.");
+
+            Room room = new Room
+            {
+                Name = dto.Name,
+                Capacity = dto.Capacity,
+                Building = building
+            };
+
+            foreach (string equipmentName in dto.Equipments)
+            {
+                if (string.IsNullOrWhiteSpace(equipmentName))
+                    return (false, "Equipment name cannot be empty.");
+
+                room.Equipments.Add(new Equipment
+                {
+                    Name = equipmentName,
+                    CreatedBy = user
+                });
+            }
+
+            _context.Rooms.Add(room);
+            await _context.SaveChangesAsync();
+
+            return (true, null);
+        }
     }
 }
