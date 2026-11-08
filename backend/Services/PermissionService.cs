@@ -14,9 +14,7 @@ namespace KeyManagement.Api.Services
             _context = context;
         }
 
-        public async Task<Permission> CreatePermissionAsync(
-            CreatePermissionDTO dto,
-            int createdByUserId)
+        public async Task<Permission> CreatePermissionAsync(CreatePermissionDTO dto, int createdByUserId)
         {
             var user = await _context.Users.FindAsync(dto.UserId);
             if (user == null)
@@ -42,8 +40,7 @@ namespace KeyManagement.Api.Services
                     permission.MasterKey.Id == masterKey.Id);
             if (permissionExists)
             {
-                throw new InvalidOperationException(
-                    "User already has permission to use this master key.");
+                throw new InvalidOperationException("User already has permission to use this master key.");
             }
 
             var permission = new Permission

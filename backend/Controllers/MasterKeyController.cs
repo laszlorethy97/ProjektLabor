@@ -1,9 +1,12 @@
 using KeyManagement.Api.Models.Entities;
 using KeyManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KeyManagement.Api.Controllers;
 
+[Authorize(Roles = "admin")]
 [ApiController]
 [Route("api/[controller]")]
 public class MasterKeyController : ControllerBase
@@ -15,5 +18,28 @@ public class MasterKeyController : ControllerBase
         _service = service;
     }
 
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateMasterKey()
+    {
+        if (!int.TryParse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier),
+            out int adminId))
+        {
+            return Unauthorized();
+        }
 
+        try
+        {
+            var newMasterKey = await _service.CreateMasterKeyAsync(adminId);
+            return StatusCode(StatusCodes.Status201Created, newMasterKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
+        }
+    }
 }
