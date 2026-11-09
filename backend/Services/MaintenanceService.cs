@@ -18,6 +18,11 @@ namespace KeyManagement.Api.Services
             CreateMaintenanceDTO dto,
             int userId)
         {
+            if (dto.StartTime <= DateTime.UtcNow)
+            {
+                return (false, "Maintenance must start in the future.");
+            }
+
             if (dto.StartTime >= dto.EndTime)
             {
                 return (false, "Start time must be earlier than end time.");

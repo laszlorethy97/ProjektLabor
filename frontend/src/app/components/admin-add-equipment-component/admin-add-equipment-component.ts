@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
@@ -20,8 +20,8 @@ export class AdminAddEquipmentComponent {
   };
 
   equipmentInput = '';
-  statusMessage = '';
-  statusIsError = false;
+  readonly statusMessage = signal('');
+  readonly statusIsError = signal(false);
 
   updateEquipment(value: string): void {
     this.equipmentInput = value;
@@ -29,8 +29,8 @@ export class AdminAddEquipmentComponent {
       .split(',')
       .map((item) => item.trim())
       .filter((item) => item.length > 0);
-    this.statusMessage = '';
-    this.statusIsError = false;
+    this.statusMessage.set('');
+    this.statusIsError.set(false);
   }
 
   requestData(): void {
@@ -40,13 +40,14 @@ export class AdminAddEquipmentComponent {
       this.formData.roomId <= 0 ||
       this.formData.equipment.length === 0
     ) {
-      this.statusMessage = 'Adj meg egy érvényes teremazonosítót és legalább egy felszerelést.';
-      this.statusIsError = true;
+      this.statusMessage.set('Adj meg egy érvényes teremazonosítót és legalább egy felszerelést.');
+      this.statusIsError.set(true);
       return;
     }
 
-    this.statusMessage =
-      'A felszerelési igény adatai bekérve. Az adatok ezen a felületen még nem kerülnek mentésre.';
-    this.statusIsError = false;
+    this.statusMessage.set(
+      'Az adatok érvényesek, de a felszerelési igény végpontja nincs bekötve; mentés nem történt.',
+    );
+    this.statusIsError.set(false);
   }
 }

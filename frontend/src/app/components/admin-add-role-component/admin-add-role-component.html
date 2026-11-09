@@ -95,11 +95,16 @@
       </section>
 
       <footer class="role-assignment__footer admin-form-footer">
-        <p class="admin-form-status" [class.admin-form-status--error]="statusIsError" role="status">
-          {{ statusMessage }}
+        <p
+          class="admin-form-status"
+          [class.admin-form-status--error]="statusIsError()"
+          role="status"
+          aria-live="polite"
+        >
+          {{ statusMessage() }}
         </p>
-        <button class="admin-form-submit" type="submit" [disabled]="roleForm.invalid">
-          Szerepkörök bekérése
+        <button class="admin-form-submit" type="submit" [disabled]="roleForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Feldolgozás...' : 'Szerepkörök hozzárendelése' }}
         </button>
       </footer>
     </form>

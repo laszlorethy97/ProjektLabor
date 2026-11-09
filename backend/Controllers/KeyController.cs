@@ -38,7 +38,16 @@ public class KeyController : ControllerBase
             }
 
             var newKey = await _service.CreateKeyAsync(dto.Code, dto.RoomName, adminId);
-            return CreatedAtAction(nameof(GetAllKeys), new { id = newKey.Id }, newKey);
+            return CreatedAtAction(
+                nameof(GetAllKeys),
+                new { id = newKey.Id },
+                new
+                {
+                    newKey.Id,
+                    newKey.Code,
+                    RoomName = newKey.Room.Name,
+                    newKey.CreatedAt
+                });
         }
         catch (KeyNotFoundException ex)
         {

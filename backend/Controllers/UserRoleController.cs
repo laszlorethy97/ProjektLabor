@@ -20,6 +20,7 @@ public class UserRoleController : ControllerBase
     }
 
     [HttpPost("assign")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> AssignRoles([FromBody] AssignRolesDto dto)
     {
         try
@@ -27,11 +28,19 @@ public class UserRoleController : ControllerBase
             var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(nameIdentifier) || !int.TryParse(nameIdentifier, out int adminId))
             {
-                return Unauthorized("Invalid or missing admin token.");
+                return Forbid();
             }
 
-            var result = await _service.CreateUserRoleAsync(dto.UserId, dto.RoleIds, adminId);
-            return Ok(result);
+            var userRoles = await _service.CreateUserRoleAsync(dto.UserId, dto.RoleIds, adminId);
+            return Ok(new
+            {
+                UserId = dto.UserId,
+                Roles = userRoles.Select(userRole => new
+                {
+                    userRole.Role.Id,
+                    userRole.Role.Type
+                })
+            });
         }
         catch (KeyNotFoundException ex)
         {

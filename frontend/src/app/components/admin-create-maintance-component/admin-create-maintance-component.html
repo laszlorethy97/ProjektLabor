@@ -42,8 +42,10 @@
               type="datetime-local"
               step="60"
               required
+              [min]="minimumStartDateTime()"
               [max]="endDate || null"
-              [(ngModel)]="startDate"
+              [ngModel]="startDate"
+              (ngModelChange)="updateStartDate($event)"
             />
           </div>
 
@@ -66,17 +68,18 @@
       <footer class="maintenance-form__footer admin-form-footer">
         <p
           class="admin-form-status"
-          [class.admin-form-status--error]="statusIsError"
+          [class.admin-form-status--error]="statusIsError()"
           role="status"
+          aria-live="polite"
         >
-          {{ statusMessage }}
+          {{ statusMessage() }}
         </p>
         <button
           class="admin-form-submit"
           type="submit"
-          [disabled]="maintenanceForm.invalid || roomId < 1"
+          [disabled]="maintenanceForm.invalid || roomId < 1 || isSubmitting()"
         >
-          Időszak bekérése
+          {{ isSubmitting() ? 'Feldolgozás...' : 'Karbantartás létrehozása' }}
         </button>
       </footer>
     </form>

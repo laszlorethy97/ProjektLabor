@@ -111,10 +111,11 @@
       <footer class="user-form__footer admin-form-footer">
         <p
           class="admin-form-status"
-          [class.admin-form-status--error]="statusIsError"
+          [class.admin-form-status--error]="statusIsError()"
           role="status"
+          aria-live="polite"
         >
-          {{ statusMessage }}
+          {{ statusMessage() }}
         </p>
         <button class="admin-form-submit" type="submit" [disabled]="userForm.invalid">
           Regisztrációs adatok bekérése

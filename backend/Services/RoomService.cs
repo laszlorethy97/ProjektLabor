@@ -66,26 +66,40 @@ namespace KeyManagement.Api.Services
         public async Task<(bool Success, string? Error)> CreateRoomAsync(
             CreateRoomDTO dto, int userId)
         {
+            string roomName = dto.Name.Trim();
+            if (string.IsNullOrWhiteSpace(roomName))
+                return (false, "Room name cannot be empty.");
+
+            bool roomExists = await _context.Rooms
+                .AnyAsync(r => r.Name.ToUpper() == roomName.ToUpper());
+
+            if (roomExists)
+                return (false, "A room with this name already exists.");
+
             Building? building = await _context.Buildings
                 .FirstOrDefaultAsync(b => b.Id == dto.BuildingId);
 
             if (building == null)
                 return (false, "Building not found.");
 
+            string normalizedBuildingName = building.Name.ToUpperInvariant();
+            bool duplicateBuildingName = await _context.Buildings.AnyAsync(
+                b => b.Id != building.Id && b.Name.ToUpper() == normalizedBuildingName);
+
+            if (duplicateBuildingName)
+                return (false, "A building with this name already exists.");
+
             User? user = await _context.Users.FindAsync(userId);
 
             if (user == null)
                 return (false, "User not found.");
-
-            if (string.IsNullOrWhiteSpace(dto.Name))
-                return (false, "Room name cannot be empty.");
 
             if (dto.Capacity <= 0)
                 return (false, "Capacity must be greater than zero.");
 
             Room room = new Room
             {
-                Name = dto.Name,
+                Name = roomName,
                 Capacity = dto.Capacity,
                 Building = building
             };

@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
@@ -6,16 +8,22 @@ import { AdminCreateRoomComponent } from './admin-create-room-component';
 describe('AdminCreateRoomComponent', () => {
   let component: AdminCreateRoomComponent;
   let fixture: ComponentFixture<AdminCreateRoomComponent>;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AdminCreateRoomComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminCreateRoomComponent);
     component = fixture.componentInstance;
+    httpTestingController = TestBed.inject(HttpTestingController);
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should create', () => {
@@ -38,18 +46,16 @@ describe('AdminCreateRoomComponent', () => {
     expect(component.formData.equipment).toEqual(['projektor', 'tábla', 'számítógép']);
   });
 
-  it('should provide a submit button and confirm the room data request', () => {
+  it('should prevent submitting invalid room data', () => {
     fixture.detectChanges();
-
-    const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('button[type="submit"]')?.textContent).toContain(
-      'Terem adatainak bekérése',
-    );
 
     component.requestData();
 
-    expect(component.statusMessage).toBe('A terem adatai bekérve.');
-    expect(element.textContent).not.toContain('Az adatok ezen a felületen még nem kerülnek mentésre.');
+    expect(component.statusMessage()).toBe(
+      'Adj meg érvényes épületazonosítót, teremnevet és befogadóképességet.',
+    );
+    expect(component.statusIsError()).toBe(true);
+    httpTestingController.expectNone('/api/Room');
   });
 
   it('should collect valid room fields when the form is submitted', async () => {
@@ -73,14 +79,52 @@ describe('AdminCreateRoomComponent', () => {
 
     const submitButton = element.querySelector('button[type="submit"]') as HTMLButtonElement;
     expect(submitButton.disabled).toBe(false);
-    submitButton.click();
-    await fixture.whenStable();
 
     expect(component.formData).toMatchObject({
       buildingId: 2,
       roomName: '301-es terem',
       capacity: 24,
     });
-    expect(component.statusMessage).toBe('A terem adatai bekérve.');
+
+    submitButton.click();
+    await fixture.whenStable();
+    const request = httpTestingController.expectOne('/api/Room');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      buildingId: 2,
+      name: '301-es terem',
+      capacity: 24,
+      equipments: [],
+    });
+    expect(component.isSubmitting()).toBe(true);
+    request.flush({ message: 'Room created successfully.' });
+
+    expect(component.statusMessage()).toBe('A terem létrehozása sikeres.');
+    expect(component.statusIsError()).toBe(false);
+    expect(component.isSubmitting()).toBe(false);
+    fixture.detectChanges();
+    expect(element.textContent).toContain('A terem létrehozása sikeres.');
+  });
+
+  it('should include the parsed equipment list and show backend errors', () => {
+    component.formData = {
+      buildingId: 2,
+      roomName: '301-es terem',
+      capacity: 24,
+      equipment: [],
+    };
+    component.updateEquipment('projektor, tábla');
+    component.requestData();
+
+    const request = httpTestingController.expectOne('/api/Room');
+    expect(request.request.body.equipments).toEqual(['projektor', 'tábla']);
+    request.flush(
+      { message: 'Building not found.' },
+      { status: 400, statusText: 'Bad Request' },
+    );
+
+    expect(component.statusMessage()).toBe('Building not found.');
+    expect(component.statusIsError()).toBe(true);
+    expect(component.isSubmitting()).toBe(false);
   });
 });

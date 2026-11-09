@@ -38,10 +38,13 @@ describe('AdminCreatePermissionComponent', () => {
     component.createPermission();
     fixture.detectChanges();
 
+    const request = httpTestingController.expectOne('/api/Permission');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ userId: 12, masterKeyId: 3 });
     expect(fixture.nativeElement.textContent).toContain('Engedély mentése…');
     expect(component.isSaving()).toBe(true);
 
-    httpTestingController.expectOne('/api/Permission').flush(null);
+    request.flush({ id: 5, userId: 12, masterKeyId: 3 }, { status: 201, statusText: 'Created' });
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain(

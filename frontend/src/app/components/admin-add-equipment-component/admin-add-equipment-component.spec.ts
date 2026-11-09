@@ -42,8 +42,8 @@ describe('AdminAddEquipmentComponent', () => {
 
     component.requestData();
 
-    expect(component.statusMessage).toContain('A felszerelési igény adatai bekérve.');
-    expect(component.statusIsError).toBe(false);
+    expect(component.statusMessage()).toContain('végpontja nincs bekötve');
+    expect(component.statusIsError()).toBe(false);
   });
 
   it('should reject a missing equipment list', () => {
@@ -52,7 +52,7 @@ describe('AdminAddEquipmentComponent', () => {
 
     component.requestData();
 
-    expect(component.statusMessage).toContain('Adj meg egy érvényes teremazonosítót');
-    expect(component.statusIsError).toBe(true);
+    expect(component.statusMessage()).toContain('Adj meg egy érvényes teremazonosítót');
+    expect(component.statusIsError()).toBe(true);
   });
 });
