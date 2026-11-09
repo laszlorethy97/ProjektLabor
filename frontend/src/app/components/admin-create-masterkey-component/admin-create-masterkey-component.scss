@@ -154,6 +154,11 @@
     box-shadow: 0 4px 12px #456ba933;
   }
 
+  &:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+
   &:focus-visible {
     outline: 3px solid #5278bd59;
     outline-offset: 3px;
@@ -173,4 +178,8 @@
   margin-top: 0.9rem;
   color: #34745b;
   font-size: 0.8rem;
+}
+
+.masterkey-card__status--error {
+  color: #b42318;
 }

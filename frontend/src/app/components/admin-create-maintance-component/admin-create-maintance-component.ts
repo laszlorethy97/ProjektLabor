@@ -1,8 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AdminService } from '../../services/admin-service';
 import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
+import { RoomScheduleDto, RoomTimeIntervalDto } from '../../dtos/room-schedule.dto';
+import { RoomReservationService } from '../../services/room-reservation-service';
 
 @Component({
   selector: 'app-admin-create-maintance-component',
@@ -10,9 +12,10 @@ import { getAdminRequestErrorMessage } from '../../services/admin-request-error'
   templateUrl: './admin-create-maintance-component.html',
   styleUrl: './admin-create-maintance-component.scss',
 })
-export class AdminCreateMaintanceComponent {
+export class AdminCreateMaintanceComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly adminService = inject(AdminService);
+  private readonly roomReservationService = inject(RoomReservationService);
 
   readonly roomId = Number(this.route.snapshot.paramMap.get('roomId'));
   readonly minimumStartDateTime = signal(this.getMinimumStartDateTime());
@@ -21,6 +24,52 @@ export class AdminCreateMaintanceComponent {
   readonly statusMessage = signal('');
   readonly statusIsError = signal(false);
   readonly isSubmitting = signal(false);
+  readonly roomSchedule = signal<RoomScheduleDto | null>(null);
+  readonly isScheduleLoading = signal(false);
+  readonly scheduleError = signal('');
+
+  readonly reservations = computed(() => this.roomSchedule()?.reservations ?? []);
+  readonly maintenances = computed(() => this.roomSchedule()?.maintenances ?? []);
+
+  ngOnInit(): void {
+    this.loadRoomSchedule();
+  }
+
+  loadRoomSchedule(): void {
+    if (!Number.isInteger(this.roomId) || this.roomId < 1) {
+      this.scheduleError.set('Érvénytelen teremazonosító.');
+      return;
+    }
+
+    this.isScheduleLoading.set(true);
+    this.scheduleError.set('');
+    this.roomReservationService.loadRoomSchedule(this.roomId).subscribe({
+      next: (schedule) => {
+        this.roomSchedule.set(schedule);
+        this.isScheduleLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.scheduleError.set(getAdminRequestErrorMessage(
+          error,
+          'Nem sikerült betölteni a terem foglaltságát.',
+        ));
+        this.isScheduleLoading.set(false);
+      },
+    });
+  }
+
+  formatInterval(interval: RoomTimeIntervalDto): string {
+    const format = (value: string) =>
+      new Date(value).toLocaleString('hu-HU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+    return `${format(interval.startTime)} – ${format(interval.endTime)}`;
+  }
 
   updateStartDate(value: string): void {
     this.startDate = value;
@@ -64,6 +113,7 @@ export class AdminCreateMaintanceComponent {
         this.statusMessage.set('A karbantartás sikeresen létrejött.');
         this.statusIsError.set(false);
         this.isSubmitting.set(false);
+        this.loadRoomSchedule();
       },
       error: (error: unknown) => {
         this.statusMessage.set(this.getErrorMessage(error));

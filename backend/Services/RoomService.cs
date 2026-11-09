@@ -31,36 +31,38 @@ namespace KeyManagement.Api.Services
                 .ToListAsync();
         }
 
-        public async Task<RoomScheduleDTO?> GetRoomScheduleAsync(int roomId)
+        public async Task<RoomScheduleDTO?> GetRoomScheduleAsync(
+            int roomId,
+            CancellationToken cancellationToken = default)
         {
-            Room? room = await _context.Rooms
-                .Include(r => r.Reservations)
-                .Include(r => r.Maintenances)
-                .FirstOrDefaultAsync(r => r.Id == roomId);
+            bool roomExists = await _context.Rooms
+                .AsNoTracking()
+                .AnyAsync(r => r.Id == roomId, cancellationToken);
 
-            if (room == null)
+            if (!roomExists)
             {
                 return null;
             }
 
-            return new RoomScheduleDTO
-            {
-                Reservations = room.Reservations
-                    .Select(r => new TimeIntervalDTO
-                    {
-                        StartTime = r.StartTime,
-                        EndTime = r.EndTime
-                    })
-                    .ToList(),
+            List<TimeIntervalDTO> reservations = await _context.Reservations
+                .AsNoTracking()
+                .Where(reservation => reservation.Room.Id == roomId)
+                .OrderBy(reservation => reservation.StartTime)
+                .Select(reservation => new TimeIntervalDTO(
+                    new DateTimeOffset(DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc)),
+                    new DateTimeOffset(DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc))))
+                .ToListAsync(cancellationToken);
 
-                Maintenances = room.Maintenances
-                    .Select(m => new TimeIntervalDTO
-                    {
-                        StartTime = m.StartTime,
-                        EndTime = m.EndTime
-                    })
-                    .ToList()
-            };
+            List<TimeIntervalDTO> maintenances = await _context.Maintenances
+                .AsNoTracking()
+                .Where(maintenance => maintenance.Room.Id == roomId)
+                .OrderBy(maintenance => maintenance.StartTime)
+                .Select(maintenance => new TimeIntervalDTO(
+                    new DateTimeOffset(DateTime.SpecifyKind(maintenance.StartTime, DateTimeKind.Utc)),
+                    new DateTimeOffset(DateTime.SpecifyKind(maintenance.EndTime, DateTimeKind.Utc))))
+                .ToListAsync(cancellationToken);
+
+            return new RoomScheduleDTO(reservations, maintenances);
         }
 
         public async Task<(bool Success, string? Error)> CreateRoomAsync(

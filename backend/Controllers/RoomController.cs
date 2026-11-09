@@ -27,12 +27,39 @@ public class RoomController : ControllerBase
         return Ok(await _service.GetRoomsByBuildingAsync());
     }
 
+    /// <summary>Returns reservations and maintenance intervals for a room.</summary>
+    [HttpGet("schedule/{roomId:int}")]
+    [Authorize]
+    [ProducesResponseType(typeof(RoomScheduleDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<RoomScheduleDTO>> GetRoomScheduleAsync(
+        int roomId,
+        CancellationToken cancellationToken)
+    {
+        if (roomId <= 0)
+        {
+            return BadRequest(new { message = "Room ID must be a positive integer." });
+        }
+
+        var result = await _service.GetRoomScheduleAsync(roomId, cancellationToken);
+
+        if (result == null)
+        {
+            return NotFound(new { message = "Room not found." });
+        }
+
+        return Ok(result);
+    }
+
     [HttpPost("schedule")]
     [Authorize]
     public async Task<ActionResult<RoomScheduleDTO>> GetRoomScheduleAsync(
-        RoomScheduleRequestDTO dto)
+        RoomScheduleRequestDTO dto,
+        CancellationToken cancellationToken)
     {
-        var result = await _service.GetRoomScheduleAsync(dto.RoomId);
+        var result = await _service.GetRoomScheduleAsync(dto.RoomId, cancellationToken);
 
         if (result == null)
         {

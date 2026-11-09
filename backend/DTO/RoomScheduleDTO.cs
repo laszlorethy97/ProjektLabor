@@ -1,14 +1,9 @@
-namespace KeyManagement.Api.DTO
-{
-    public class RoomScheduleDTO
-    {
-        public List<TimeIntervalDTO> Reservations { get; set; } = new();
-        public List<TimeIntervalDTO> Maintenances { get; set; } = new();
-    }
+namespace KeyManagement.Api.DTO;
 
-    public class TimeIntervalDTO
-    {
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-    }
-}
+/// <summary>Contains all reservation and maintenance intervals for a room.</summary>
+public sealed record RoomScheduleDTO(
+    IReadOnlyList<TimeIntervalDTO> Reservations,
+    IReadOnlyList<TimeIntervalDTO> Maintenances);
+
+/// <summary>Represents a room occupancy interval in UTC.</summary>
+public sealed record TimeIntervalDTO(DateTimeOffset StartTime, DateTimeOffset EndTime);

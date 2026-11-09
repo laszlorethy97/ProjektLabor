@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RoomEquipmentDto } from '../dtos/room-equipment.dto';
 import { RoomReservationDto } from '../dtos/room-reservation.dto';
+import { RoomScheduleDto } from '../dtos/room-schedule.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,10 @@ export class RoomReservationService {
 
   loadEquipments(roomId: number): Observable<RoomEquipmentDto[]> {
     return this.httpClient.get<RoomEquipmentDto[]>(`/api/Equipment/by-room-id/${roomId}`);
+  }
+
+  loadRoomSchedule(roomId: number): Observable<RoomScheduleDto> {
+    return this.httpClient.get<RoomScheduleDto>(`/api/Room/schedule/${roomId}`);
   }
 
   createReservation(reservation: RoomReservationDto): Observable<void> {

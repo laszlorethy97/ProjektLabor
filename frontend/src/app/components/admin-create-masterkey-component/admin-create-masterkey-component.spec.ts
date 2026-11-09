@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
@@ -6,16 +8,22 @@ import { AdminCreateMasterkeyComponent } from './admin-create-masterkey-componen
 describe('AdminCreateMasterkeyComponent', () => {
   let component: AdminCreateMasterkeyComponent;
   let fixture: ComponentFixture<AdminCreateMasterkeyComponent>;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AdminCreateMasterkeyComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminCreateMasterkeyComponent);
     component = fixture.componentInstance;
+    httpTestingController = TestBed.inject(HttpTestingController);
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should create', () => {
@@ -31,15 +39,30 @@ describe('AdminCreateMasterkeyComponent', () => {
     expect(pageText).not.toContain('adatküldés nem történik');
   });
 
-  it('should indicate that master key creation is not connected to an endpoint', () => {
+  it('creates a master key and displays success feedback', () => {
     fixture.detectChanges();
 
     const button = (fixture.nativeElement as HTMLElement).querySelector('button');
     expect(button).toBeTruthy();
     button?.click();
 
-    expect(component.statusMessage()).toBe(
-      'A mesterkulcs-létrehozó végpont nincs bekötve; mentés nem történt.',
-    );
+    const request = httpTestingController.expectOne('/api/MasterKey/create');
+    expect(request.request.method).toBe('POST');
+    request.flush({ id: 1 }, { status: 201, statusText: 'Created' });
+
+    expect(component.statusMessage()).toBe('A mesterkulcs sikeresen létrejött.');
+    expect(component.statusIsError()).toBe(false);
+    expect(component.isSubmitting()).toBe(false);
+  });
+
+  it('displays the backend error when master key creation fails', () => {
+    component.createMasterKey();
+
+    const request = httpTestingController.expectOne('/api/MasterKey/create');
+    request.flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+
+    expect(component.statusMessage()).toBe('Forbidden');
+    expect(component.statusIsError()).toBe(true);
+    expect(component.isSubmitting()).toBe(false);
   });
 });
