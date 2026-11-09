@@ -31,13 +31,15 @@ describe('AdminCreateMasterkeyComponent', () => {
     expect(pageText).not.toContain('adatküldés nem történik');
   });
 
-  it('should confirm that master key details were requested', () => {
+  it('should indicate that master key creation is not connected to an endpoint', () => {
     fixture.detectChanges();
 
     const button = (fixture.nativeElement as HTMLElement).querySelector('button');
     expect(button).toBeTruthy();
     button?.click();
 
-    expect(component.statusMessage).toBe('A mesterkulcs adatai bekérve.');
+    expect(component.statusMessage()).toBe(
+      'A mesterkulcs-létrehozó végpont nincs bekötve; mentés nem történt.',
+    );
   });
 });

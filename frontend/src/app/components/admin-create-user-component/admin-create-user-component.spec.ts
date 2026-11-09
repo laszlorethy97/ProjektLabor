@@ -36,14 +36,14 @@ describe('AdminCreateUserComponent', () => {
   it('should require a role before confirming registration data', () => {
     component.requestData();
 
-    expect(component.statusMessage).toBe('Jelölj ki legalább egy szerepkört.');
-    expect(component.statusIsError).toBe(true);
+    expect(component.statusMessage()).toBe('Jelölj ki legalább egy szerepkört.');
+    expect(component.statusIsError()).toBe(true);
 
     component.formData.roles.oktato = true;
     component.requestData();
 
-    expect(component.statusMessage).toBe('A regisztrációs adatok bekérve.');
-    expect(component.statusIsError).toBe(false);
+    expect(component.statusMessage()).toContain('a regisztrációs végpont nincs bekötve');
+    expect(component.statusIsError()).toBe(false);
   });
 
   it('should collect account details and selected roles on valid form submission', async () => {
@@ -85,6 +85,6 @@ describe('AdminCreateUserComponent', () => {
         'uzemeltetesi-igazgato': false,
       },
     });
-    expect(component.statusMessage).toBe('A regisztrációs adatok bekérve.');
+    expect(component.statusMessage()).toContain('a regisztrációs végpont nincs bekötve');
   });
 });

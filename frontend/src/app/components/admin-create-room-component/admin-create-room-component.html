@@ -95,9 +95,14 @@
       </section>
 
       <footer class="room-form__footer admin-form-footer">
-        <p class="room-form__status" role="status">{{ statusMessage }}</p>
-        <button class="admin-form-submit" type="submit" [disabled]="roomForm.invalid">
-          Terem adatainak bekérése
+        <p
+          class="room-form__status"
+          [class.admin-form-status--error]="statusIsError()"
+          role="status"
+          aria-live="polite"
+        >{{ statusMessage() }}</p>
+        <button class="admin-form-submit" type="submit" [disabled]="roomForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Feldolgozás...' : 'Terem létrehozása' }}
         </button>
       </footer>
     </form>

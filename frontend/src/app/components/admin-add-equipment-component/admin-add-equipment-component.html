@@ -80,11 +80,11 @@
       <footer class="equipment-card__footer">
         <p
           class="equipment-card__status"
-          [class.equipment-card__status--error]="statusIsError"
+          [class.equipment-card__status--error]="statusIsError()"
           role="status"
           aria-live="polite"
         >
-          {{ statusMessage }}
+          {{ statusMessage() }}
         </p>
         <button class="equipment-card__submit" type="submit" [disabled]="equipmentForm.invalid">
           Igény adatainak bekérése

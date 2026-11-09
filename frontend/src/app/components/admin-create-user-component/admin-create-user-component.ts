@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ADMIN_ROLE_OPTIONS, type AdminRole } from '../admin-role-options';
@@ -31,17 +31,17 @@ export class AdminCreateUserComponent {
     },
   };
 
-  statusMessage = '';
-  statusIsError = false;
+  readonly statusMessage = signal('');
+  readonly statusIsError = signal(false);
 
   requestData(): void {
     if (!Object.values(this.formData.roles).some(Boolean)) {
-      this.statusMessage = 'Jelölj ki legalább egy szerepkört.';
-      this.statusIsError = true;
+      this.statusMessage.set('Jelölj ki legalább egy szerepkört.');
+      this.statusIsError.set(true);
       return;
     }
 
-    this.statusMessage = 'A regisztrációs adatok bekérve.';
-    this.statusIsError = false;
+    this.statusMessage.set('Az űrlap adatai érvényesek, de a regisztrációs végpont nincs bekötve; mentés nem történt.');
+    this.statusIsError.set(false);
   }
 }

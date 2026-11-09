@@ -72,9 +72,14 @@
       </section>
 
       <footer class="key-form__footer admin-form-footer">
-        <p class="key-form__status" role="status">{{ statusMessage }}</p>
-        <button class="admin-form-submit" type="submit" [disabled]="keyForm.invalid">
-          Kulcs adatainak bekérése
+        <p
+          class="key-form__status"
+          [class.admin-form-status--error]="statusIsError()"
+          role="status"
+          aria-live="polite"
+        >{{ statusMessage() }}</p>
+        <button class="admin-form-submit" type="submit" [disabled]="keyForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Feldolgozás...' : 'Kulcs létrehozása' }}
         </button>
       </footer>
     </form>

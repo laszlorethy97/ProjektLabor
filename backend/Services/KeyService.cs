@@ -20,6 +20,7 @@ namespace KeyManagement.Api.Services
 
         public async Task<Key> CreateKeyAsync(string code, string roomName, int createdByUserId)
         {
+            code = code.Trim();
             var room = await _context.Rooms
                 .FirstOrDefaultAsync(r => r.Name == roomName);
 
@@ -29,11 +30,11 @@ namespace KeyManagement.Api.Services
             }
 
             var keyExists = await _context.Keys
-                .AnyAsync(k => k.Code == code);
+                .AnyAsync(k => k.Code.ToUpper() == code.ToUpper());
 
             if (keyExists)
             {
-                throw new InvalidOperationException($"A key with this name already exists.");
+                throw new InvalidOperationException("A key with this code already exists.");
             }
 
             var createdByUser = await _context.Users.FindAsync(createdByUserId);

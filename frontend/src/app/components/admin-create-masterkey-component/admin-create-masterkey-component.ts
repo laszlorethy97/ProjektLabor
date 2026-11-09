@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,9 +8,11 @@ import { RouterLink } from '@angular/router';
   styleUrl: './admin-create-masterkey-component.scss',
 })
 export class AdminCreateMasterkeyComponent {
-  statusMessage = '';
+  readonly statusMessage = signal('');
 
   createMasterKey(): void {
-    this.statusMessage = 'A mesterkulcs adatai bekérve.';
+    this.statusMessage.set(
+      'A mesterkulcs-létrehozó végpont nincs bekötve; mentés nem történt.',
+    );
   }
 }

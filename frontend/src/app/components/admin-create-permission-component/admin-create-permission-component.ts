@@ -1,8 +1,8 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { PermissionService } from '../../services/permission-service';
+import { AdminService } from '../../services/admin-service';
+import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
 
 @Component({
   selector: 'app-admin-create-permission-component',
@@ -11,7 +11,7 @@ import { PermissionService } from '../../services/permission-service';
   styleUrl: './admin-create-permission-component.scss',
 })
 export class AdminCreatePermissionComponent {
-  private readonly permissionService = inject(PermissionService);
+  private readonly adminService = inject(AdminService);
 
   readonly userId = signal<number | null>(null);
   readonly masterKeyId = signal<number | null>(null);
@@ -37,7 +37,7 @@ export class AdminCreatePermissionComponent {
 
     this.isSaving.set(true);
     this.statusMessage.set('');
-    this.permissionService.createPermission({ userId, masterKeyId }).subscribe({
+    this.adminService.createPermission({ userId, masterKeyId }).subscribe({
       next: () => {
         this.statusMessage.set('A mesterkulcs-használati engedély sikeresen létrejött.');
         this.statusIsError.set(false);
@@ -52,10 +52,9 @@ export class AdminCreatePermissionComponent {
   }
 
   private getErrorMessage(error: unknown): string {
-    if (error instanceof HttpErrorResponse && typeof error.error?.message === 'string') {
-      return error.error.message;
-    }
-
-    return 'Az engedély mentése nem sikerült. Próbáld újra később.';
+    return getAdminRequestErrorMessage(
+      error,
+      'Az engedély mentése nem sikerült. Próbáld újra később.',
+    );
   }
 }
