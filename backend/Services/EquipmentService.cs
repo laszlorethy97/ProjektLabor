@@ -1,6 +1,6 @@
 using KeyManagement.Api.Data;
 using KeyManagement.Api.DTO;
-
+using KeyManagement.Api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace KeyManagement.Api.Services
@@ -24,6 +24,36 @@ namespace KeyManagement.Api.Services
                     Name = e.Name
                 })
                 .ToListAsync();
+        }
+
+        public async Task<(bool Success, string? Error)> CreateEquipmentAsync(
+            CreateEquipmentDTO dto, int userId)
+        {
+            Room? room = await _context.Rooms
+                .FirstOrDefaultAsync(r => r.Id == dto.RoomId);
+
+            if (room == null)
+                return (false, "Room not found.");
+
+            User? user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return (false, "User not found.");
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return (false, "Equipment name cannot be empty.");
+
+            Equipment equipment = new Equipment
+            {
+                Name = dto.Name,
+                Room = room,
+                CreatedBy = user
+            };
+
+            _context.Equipments.Add(equipment);
+            await _context.SaveChangesAsync();
+
+            return (true, null);
         }
     }
 }
