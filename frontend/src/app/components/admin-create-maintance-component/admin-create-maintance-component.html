@@ -17,6 +17,59 @@
       </p>
     </header>
 
+    <section class="maintenance-schedule" aria-labelledby="maintenance-schedule-title">
+      <div class="maintenance-schedule__heading">
+        <div>
+          <h2 id="maintenance-schedule-title" class="maintenance-schedule__title">
+            A terem foglaltsága
+          </h2>
+          <p class="maintenance-schedule__description">
+            A már rögzített foglalások és karbantartások időpontjai.
+          </p>
+        </div>
+        <button
+          class="maintenance-schedule__refresh"
+          type="button"
+          [disabled]="isScheduleLoading()"
+          (click)="loadRoomSchedule()"
+        >
+          {{ isScheduleLoading() ? 'Betöltés…' : 'Frissítés' }}
+        </button>
+      </div>
+
+      @if (isScheduleLoading() && !roomSchedule()) {
+        <p class="maintenance-schedule__message" role="status">Foglaltsági adatok betöltése…</p>
+      } @else if (scheduleError()) {
+        <p class="maintenance-schedule__message maintenance-schedule__message--error" role="alert">
+          {{ scheduleError() }}
+        </p>
+      } @else {
+        <div class="maintenance-schedule__columns">
+          <section aria-labelledby="room-reservations-title">
+            <h3 id="room-reservations-title" class="maintenance-schedule__subtitle">Foglalások</h3>
+            <ul class="maintenance-schedule__list">
+              @for (reservation of reservations(); track $index) {
+                <li>{{ formatInterval(reservation) }}</li>
+              } @empty {
+                <li class="maintenance-schedule__empty">Még nincs rögzített foglalás.</li>
+              }
+            </ul>
+          </section>
+
+          <section aria-labelledby="room-maintenances-title">
+            <h3 id="room-maintenances-title" class="maintenance-schedule__subtitle">Karbantartások</h3>
+            <ul class="maintenance-schedule__list">
+              @for (maintenance of maintenances(); track $index) {
+                <li>{{ formatInterval(maintenance) }}</li>
+              } @empty {
+                <li class="maintenance-schedule__empty">Még nincs rögzített karbantartás.</li>
+              }
+            </ul>
+          </section>
+        </div>
+      }
+    </section>
+
     <form class="maintenance-form__card" #maintenanceForm="ngForm" (ngSubmit)="requestMaintenance()">
       <input type="hidden" name="roomId" [ngModel]="roomId" />
       <section aria-labelledby="maintenance-dates-title">

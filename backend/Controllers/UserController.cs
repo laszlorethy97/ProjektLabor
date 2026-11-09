@@ -31,22 +31,27 @@ public class UserController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Register(RegisterUserDTO registerUserDTO)
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null)
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int adminId))
         {
             return Unauthorized();
         }
 
-        int adminId = int.Parse(userId);
-
         var result = await _service.RegisterUserAsync(registerUserDTO, adminId);
 
-        if (!result.Success)
+        if (result.Success)
         {
-            return BadRequest(new { message = result.Error });
+            return StatusCode(StatusCodes.Status201Created, new
+            {
+                message = "User registered successfully."
+            });
         }
 
-        return Ok(new { message = "User registered successfully." });
+        var errorResponse = new { message = result.Error };
+        return result.ErrorCode switch
+        {
+            UserRegistrationError.EmailAlreadyRegistered => Conflict(errorResponse),
+            UserRegistrationError.AdministratorNotFound => NotFound(errorResponse),
+            _ => BadRequest(errorResponse)
+        };
     }
 }

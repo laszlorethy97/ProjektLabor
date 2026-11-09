@@ -10,6 +10,15 @@ using System.Text;
 
 namespace KeyManagement.Api.Services
 {
+    public enum UserRegistrationError
+    {
+        None,
+        EmailAlreadyRegistered,
+        InvalidPinCode,
+        AdministratorNotFound,
+        InvalidRoles
+    }
+
     public class UserService
     {
         private readonly KeyManagementDbContext _context;
@@ -76,31 +85,28 @@ namespace KeyManagement.Api.Services
             return token;
         }
 
-        public async Task<(bool Success, string? Error)> RegisterUserAsync(
+        public async Task<(bool Success, string? Error, UserRegistrationError ErrorCode)> RegisterUserAsync(
         RegisterUserDTO dto,
         int createdByUserId)
         {
-            // E-mail cím ellenőrzése
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            string email = dto.Email.Trim();
+            if (await _context.Users.AnyAsync(u => u.Email.ToUpper() == email.ToUpper()))
             {
-                return (false, "This email address is already registered.");
+                return (false, "This email address is already registered.", UserRegistrationError.EmailAlreadyRegistered);
             }
 
-            // PIN-kód ellenőrzése
             if (dto.PinCode.Length != 6 || !dto.PinCode.All(char.IsDigit))
             {
-                return (false, "PIN code must contain exactly 6 digits.");
+                return (false, "PIN code must contain exactly 6 digits.", UserRegistrationError.InvalidPinCode);
             }
 
-            // Admin lekérése
             User? admin = await _context.Users.FindAsync(createdByUserId);
 
             if (admin == null)
             {
-                return (false, "Administrator not found.");
+                return (false, "Administrator not found.", UserRegistrationError.AdministratorNotFound);
             }
 
-            // Szerepkörök lekérése
             List<string> roleNames = dto.Roles
                 .Select(r => r.Trim().ToLower())
                 .Distinct()
@@ -112,13 +118,12 @@ namespace KeyManagement.Api.Services
 
             if (roles.Count != roleNames.Count)
             {
-                return (false, "One or more roles do not exist.");
+                return (false, "One or more roles do not exist.", UserRegistrationError.InvalidRoles);
             }
 
-            // Új felhasználó létrehozása
             User user = new User
             {
-                Email = dto.Email,
+                Email = email,
                 PinCode = dto.PinCode,
                 CreatedById = admin.Id,
                 CreatedBy = admin
@@ -128,7 +133,6 @@ namespace KeyManagement.Api.Services
 
             _context.Users.Add(user);
 
-            // Szerepkörök hozzárendelése
             foreach (Role role in roles)
             {
                 UserRole userRole = new UserRole
@@ -143,7 +147,7 @@ namespace KeyManagement.Api.Services
 
             await _context.SaveChangesAsync();
 
-            return (true, null);
+            return (true, null, UserRegistrationError.None);
         }
     }
 }

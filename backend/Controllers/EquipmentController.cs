@@ -36,9 +36,19 @@ namespace KeyManagement.Api.Controllers
             var result = await _service.CreateEquipmentAsync(dto, adminId);
 
             if (!result.Success)
-                return BadRequest(new { message = result.Error });
+            {
+                var errorResponse = new { message = result.Error };
+                return result.Error switch
+                {
+                    "Room not found." or "User not found." => NotFound(errorResponse),
+                    _ => BadRequest(errorResponse)
+                };
+            }
 
-            return Ok(new { message = "Equipment created successfully." });
+            return StatusCode(StatusCodes.Status201Created, new
+            {
+                message = "Equipment created successfully."
+            });
         }
     }
 }

@@ -86,8 +86,8 @@
         >
           {{ statusMessage() }}
         </p>
-        <button class="equipment-card__submit" type="submit" [disabled]="equipmentForm.invalid">
-          Igény adatainak bekérése
+        <button class="equipment-card__submit" type="submit" [disabled]="equipmentForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Mentés folyamatban…' : 'Felszerelési igény hozzáadása' }}
         </button>
       </footer>
     </form>

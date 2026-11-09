@@ -26,13 +26,23 @@
         </svg>
       </div>
       <h2 id="masterkey-card-title" class="masterkey-card__title">Mesterkulcs</h2>
-      <button class="masterkey-card__button" type="button" (click)="createMasterKey()">
+      <button
+        class="masterkey-card__button"
+        type="button"
+        [disabled]="isSubmitting()"
+        (click)="createMasterKey()"
+      >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 5v14m-7-7h14"></path>
         </svg>
         Mesterkulcs létrehozása
       </button>
-      <p class="masterkey-card__status" role="status" aria-live="polite">{{ statusMessage() }}</p>
+      <p
+        class="masterkey-card__status"
+        [class.masterkey-card__status--error]="statusIsError()"
+        role="status"
+        aria-live="polite"
+      >{{ statusMessage() }}</p>
     </section>
   </div>
 </main>

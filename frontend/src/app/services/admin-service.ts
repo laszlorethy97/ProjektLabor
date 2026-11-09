@@ -6,6 +6,8 @@ import { CreateKeyDto } from '../dtos/create-key.dto';
 import { CreateMaintenanceDto } from '../dtos/create-maintenance.dto';
 import { CreatePermissionDto } from '../dtos/create-permission.dto';
 import { CreateRoomDto } from '../dtos/create-room.dto';
+import { CreateEquipmentDto } from '../dtos/create-equipment.dto';
+import { RegisterUserDto } from '../dtos/register-user.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -31,5 +33,17 @@ export class AdminService {
 
   createMaintenance(dto: CreateMaintenanceDto): Observable<unknown> {
     return this.httpClient.post<unknown>('/api/Maintenance', dto);
+  }
+
+  createMasterKey(): Observable<unknown> {
+    return this.httpClient.post<unknown>('/api/MasterKey/create', {});
+  }
+
+  registerUser(dto: RegisterUserDto): Observable<unknown> {
+    return this.httpClient.post<unknown>('/api/User/register', dto);
+  }
+
+  createEquipment(dto: CreateEquipmentDto): Observable<unknown> {
+    return this.httpClient.post<unknown>('/api/Equipment', dto);
   }
 }

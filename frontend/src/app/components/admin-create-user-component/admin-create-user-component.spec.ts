@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
@@ -6,16 +8,22 @@ import { AdminCreateUserComponent } from './admin-create-user-component';
 describe('AdminCreateUserComponent', () => {
   let component: AdminCreateUserComponent;
   let fixture: ComponentFixture<AdminCreateUserComponent>;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AdminCreateUserComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminCreateUserComponent);
     component = fixture.componentInstance;
+    httpTestingController = TestBed.inject(HttpTestingController);
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should create', () => {
@@ -34,6 +42,9 @@ describe('AdminCreateUserComponent', () => {
   });
 
   it('should require a role before confirming registration data', () => {
+    component.formData.email = 'new.user@example.com';
+    component.formData.pinCode = '123456';
+    component.formData.password = 'secure-password';
     component.requestData();
 
     expect(component.statusMessage()).toBe('Jelölj ki legalább egy szerepkört.');
@@ -42,11 +53,13 @@ describe('AdminCreateUserComponent', () => {
     component.formData.roles.oktato = true;
     component.requestData();
 
-    expect(component.statusMessage()).toContain('a regisztrációs végpont nincs bekötve');
+    const request = httpTestingController.expectOne('/api/User/register');
+    request.flush({ message: 'User registered successfully.' }, { status: 201, statusText: 'Created' });
+    expect(component.statusMessage()).toBe('A felhasználó regisztrációja sikeres.');
     expect(component.statusIsError()).toBe(false);
   });
 
-  it('should collect account details and selected roles on valid form submission', async () => {
+  it('submits the collected account details and selected roles', async () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -85,6 +98,40 @@ describe('AdminCreateUserComponent', () => {
         'uzemeltetesi-igazgato': false,
       },
     });
-    expect(component.statusMessage()).toContain('a regisztrációs végpont nincs bekötve');
+
+    const request = httpTestingController.expectOne('/api/User/register');
+    expect(request.request.body).toEqual({
+      email: 'uj.felhasznalo@example.com',
+      pinCode: '123456',
+      password: 'biztonsagos-jelszo',
+      roles: ['admin'],
+    });
+    request.flush({ message: 'User registered successfully.' }, { status: 201, statusText: 'Created' });
+    expect(component.statusMessage()).toBe('A felhasználó regisztrációja sikeres.');
+  });
+
+  it('shows the backend conflict message for an already registered email', () => {
+    component.formData = {
+      email: 'existing@example.com',
+      pinCode: '123456',
+      password: 'secure-password',
+      roles: {
+        oktato: true,
+        portas: false,
+        admin: false,
+        'uzemeltetesi-igazgato': false,
+      },
+    };
+
+    component.requestData();
+
+    const request = httpTestingController.expectOne('/api/User/register');
+    request.flush(
+      { message: 'This email address is already registered.' },
+      { status: 409, statusText: 'Conflict' },
+    );
+
+    expect(component.statusMessage()).toBe('This email address is already registered.');
+    expect(component.statusIsError()).toBe(true);
   });
 });

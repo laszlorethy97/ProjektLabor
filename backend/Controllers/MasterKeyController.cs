@@ -31,15 +31,15 @@ public class MasterKeyController : ControllerBase
         try
         {
             var newMasterKey = await _service.CreateMasterKeyAsync(adminId);
-            return StatusCode(StatusCodes.Status201Created, newMasterKey);
+            return StatusCode(StatusCodes.Status201Created, new
+            {
+                newMasterKey.Id,
+                newMasterKey.CreatedAt
+            });
         }
         catch (KeyNotFoundException ex)
         {
             return NotFound(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
         }
     }
 }
