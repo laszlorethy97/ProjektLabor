@@ -132,6 +132,42 @@
   margin-left: 2.9rem;
 }
 
+.maintenance-form__schedule {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 0 2.9rem;
+  padding: 1rem;
+  border: 1px solid #e6ebf2;
+  border-radius: 0.75rem;
+  background: #f8faff;
+  color: #68758a;
+  font-size: 0.75rem;
+}
+
+.maintenance-form__schedule-title {
+  margin-bottom: 0.35rem;
+  color: #35445c;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.maintenance-form__schedule-list {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.maintenance-form__schedule-message,
+.maintenance-form__schedule-error {
+  grid-column: 1 / -1;
+}
+
+.maintenance-form__schedule-error {
+  color: #9c2c2c;
+}
+
 .maintenance-form__label {
   display: block;
   margin-bottom: 0.5rem;
@@ -170,6 +206,11 @@
   }
 
   .maintenance-form__fields {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
+  .maintenance-form__schedule {
     grid-template-columns: 1fr;
     margin-left: 0;
   }

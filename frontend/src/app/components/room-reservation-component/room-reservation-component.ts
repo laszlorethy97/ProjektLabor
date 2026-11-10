@@ -41,6 +41,12 @@ export class RoomReservationComponent implements OnInit {
   readonly schedule = signal<RoomScheduleDto>({ reservations: [], maintenances: [] });
   readonly reservations = computed(() => this.sortIntervals(this.schedule().reservations));
   readonly maintenances = computed(() => this.sortIntervals(this.schedule().maintenances));
+  readonly reservationsForSelectedDate = computed(() =>
+    this.intervalsForSelectedDate(this.reservations()),
+  );
+  readonly maintenancesForSelectedDate = computed(() =>
+    this.intervalsForSelectedDate(this.maintenances()),
+  );
   readonly isLoadingSchedule = signal(false);
   readonly scheduleError = signal('');
   readonly selectedDate = signal<Date | null>(null);
@@ -199,6 +205,27 @@ export class RoomReservationComponent implements OnInit {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+    });
+  }
+
+  formatTimeRange(interval: TimeIntervalDto): string {
+    const formatTime = (value: string) =>
+      new Date(value).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+    return `${formatTime(interval.startTime)} – ${formatTime(interval.endTime)}`;
+  }
+
+  private intervalsForSelectedDate(intervals: TimeIntervalDto[]): TimeIntervalDto[] {
+    const date = this.selectedDate();
+    if (!date) {
+      return [];
+    }
+
+    const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime();
+    return intervals.filter((interval) => {
+      const start = new Date(interval.startTime).getTime();
+      const end = new Date(interval.endTime).getTime();
+      return start < dayEnd && end > dayStart;
     });
   }
 

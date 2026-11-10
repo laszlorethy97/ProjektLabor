@@ -42,10 +42,50 @@ describe('AdminCreateUserComponent', () => {
   });
 
   it('should require at least one role before registering', () => {
+    component.formData.email = 'user@example.com';
+    component.formData.pinCode = '123456';
     component.requestData();
 
     expect(component.statusMessage()).toBe('Jelölj ki legalább egy szerepkört.');
     expect(component.statusIsError()).toBe(true);
+    httpTestingController.expectNone('/api/User/register');
+  });
+
+  it('should strip non-digits from the PIN and limit it to six digits', () => {
+    const input = document.createElement('input');
+    input.value = '12ab345678';
+    const event = new Event('input');
+    Object.defineProperty(event, 'target', { value: input });
+
+    component.sanitizePinCode(event);
+
+    expect(input.value).toBe('123456');
+    expect(component.formData.pinCode).toBe('123456');
+  });
+
+  it('should reject invalid email addresses and PINs even when submitted directly', () => {
+    component.formData = {
+      email: 'not-an-email',
+      pinCode: '12ab56',
+      password: 'valid-password',
+      roles: {
+        oktato: true,
+        portas: false,
+        admin: false,
+        'uzemeltetesi-igazgato': false,
+      },
+    };
+
+    component.requestData();
+
+    expect(component.statusMessage()).toBe('Érvényes e-mail-címet adj meg.');
+    expect(component.statusIsError()).toBe(true);
+    httpTestingController.expectNone('/api/User/register');
+
+    component.formData.email = 'user@example.com';
+    component.requestData();
+
+    expect(component.statusMessage()).toBe('A PIN-kód pontosan 6 számjegyből álljon.');
     httpTestingController.expectNone('/api/User/register');
   });
 

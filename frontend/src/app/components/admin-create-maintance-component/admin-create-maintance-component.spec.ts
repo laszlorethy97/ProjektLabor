@@ -48,6 +48,8 @@ describe('AdminCreateMaintanceComponent', () => {
     fixture = TestBed.createComponent(AdminCreateMaintanceComponent);
     component = fixture.componentInstance;
     httpTestingController = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    httpTestingController.expectOne('/api/Room/schedule').flush({ reservations: [], maintenances: [] });
     await fixture.whenStable();
   });
 
@@ -64,6 +66,26 @@ describe('AdminCreateMaintanceComponent', () => {
 
     expect(component.roomId).toBe(42);
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('42. terem');
+  });
+
+  it('should show the selected room schedule beside the maintenance time fields', () => {
+    component.loadSchedule();
+    httpTestingController.expectOne('/api/Room/schedule').flush({
+      reservations: [
+        { startTime: '2030-01-15T10:00:00Z', endTime: '2030-01-15T11:00:00Z' },
+      ],
+      maintenances: [
+        { startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T12:00:00Z' },
+      ],
+    });
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('.maintenance-form__schedule')).toBeTruthy();
+    expect(element.textContent).toContain('Foglalások');
+    expect(element.textContent).toContain('Karbantartások');
+    expect(element.textContent).toContain(component.formatDateTime('2030-01-15T10:00:00Z'));
+    expect(element.textContent).toContain(component.formatDateTime('2030-01-16T12:00:00Z'));
   });
 
   it('should require a valid increasing from-to date and time period', () => {
@@ -112,6 +134,10 @@ describe('AdminCreateMaintanceComponent', () => {
     });
     expect(component.isSubmitting()).toBe(true);
     request.flush({ message: 'Maintenance created successfully.' });
+    httpTestingController.expectOne('/api/Room/schedule').flush({
+      reservations: [],
+      maintenances: [],
+    });
 
     expect(component.statusMessage()).toBe('A karbantartás sikeresen létrejött.');
     expect(component.statusIsError()).toBe(false);

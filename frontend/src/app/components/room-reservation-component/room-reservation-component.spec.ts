@@ -53,26 +53,29 @@ describe('RoomReservationComponent', () => {
     expect(items.length).toBe(2);
   });
 
-  it('should list reservation and maintenance start and end times', () => {
+  it('should show only the selected date schedule next to the time selector', () => {
     httpTesting.expectOne('/api/Equipment/by-room-id/7').flush([]);
     component.loadSchedule();
     httpTesting.expectOne('/api/Room/schedule').flush({
       reservations: [
-        { startTime: '2030-01-15T10:00:00Z', endTime: '2030-01-15T10:45:00Z' },
+        { startTime: '2030-01-15T10:00:00', endTime: '2030-01-15T10:45:00' },
+        { startTime: '2030-01-16T10:00:00', endTime: '2030-01-16T10:45:00' },
       ],
       maintenances: [
-        { startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T12:00:00Z' },
+        { startTime: '2030-01-15T08:00:00', endTime: '2030-01-15T12:00:00' },
       ],
     });
+    component.selectDate({ date: new Date(2030, 0, 15), inMonth: true, disabled: false });
     fixture.detectChanges();
 
-    const pageText = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    const element = fixture.nativeElement as HTMLElement;
+    const pageText = element.textContent ?? '';
     expect(pageText).toContain('Foglalások');
-    expect(pageText).toContain(component.formatDateTime('2030-01-15T10:00:00Z'));
-    expect(pageText).toContain(component.formatDateTime('2030-01-15T10:45:00Z'));
+    expect(pageText).toContain('10:00 – 10:45');
     expect(pageText).toContain('Karbantartások');
-    expect(pageText).toContain(component.formatDateTime('2030-01-16T08:00:00Z'));
-    expect(pageText).toContain(component.formatDateTime('2030-01-16T12:00:00Z'));
+    expect(pageText).toContain('08:00 – 12:00');
+    expect(pageText).not.toContain('2030. 01. 16.');
+    expect(element.querySelector('.reservation__schedule')).toBeTruthy();
   });
 
   it('should send the selected day, hour and equipments on submit', () => {

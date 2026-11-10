@@ -72,14 +72,13 @@ $accent-soft: #e8ecf7;
 }
 
 .reservation__schedule {
-  padding-bottom: utils.rem(20);
-  border-bottom: utils.rem(1) solid $line;
-}
-
-.reservation__schedule-group {
   display: flex;
-  flex-direction: column;
-  gap: utils.rem(6);
+  flex-wrap: wrap;
+  gap: utils.rem(16);
+  padding: utils.rem(12);
+  border: utils.rem(1) solid $line;
+  border-radius: utils.rem(10);
+  background-color: $surface-alt;
 }
 
 .reservation__schedule-heading {
@@ -91,6 +90,7 @@ $accent-soft: #e8ecf7;
   display: flex;
   flex-direction: column;
   gap: utils.rem(6);
+  margin: utils.rem(6) 0 0;
   padding: 0;
   color: $ink-soft;
   font-size: utils.rem(13);

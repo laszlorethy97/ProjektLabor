@@ -1,8 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+import { RoomScheduleDto, TimeIntervalDto } from '../../dtos/room-schedule.dto';
 import { AdminService } from '../../services/admin-service';
 import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
+import { RoomReservationService } from '../../services/room-reservation-service';
 
 @Component({
   selector: 'app-admin-create-maintance-component',
@@ -10,9 +13,10 @@ import { getAdminRequestErrorMessage } from '../../services/admin-request-error'
   templateUrl: './admin-create-maintance-component.html',
   styleUrl: './admin-create-maintance-component.scss',
 })
-export class AdminCreateMaintanceComponent {
+export class AdminCreateMaintanceComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly adminService = inject(AdminService);
+  private readonly roomReservationService = inject(RoomReservationService);
 
   readonly roomId = Number(this.route.snapshot.paramMap.get('roomId'));
   readonly minimumStartDateTime = signal(this.getMinimumStartDateTime());
@@ -21,6 +25,47 @@ export class AdminCreateMaintanceComponent {
   readonly statusMessage = signal('');
   readonly statusIsError = signal(false);
   readonly isSubmitting = signal(false);
+  readonly schedule = signal<RoomScheduleDto>({ reservations: [], maintenances: [] });
+  readonly isLoadingSchedule = signal(false);
+  readonly scheduleError = signal('');
+
+  ngOnInit(): void {
+    this.loadSchedule();
+  }
+
+  loadSchedule(): void {
+    if (!Number.isInteger(this.roomId) || this.roomId < 1) {
+      return;
+    }
+
+    this.isLoadingSchedule.set(true);
+    this.scheduleError.set('');
+    this.roomReservationService
+      .loadRoomSchedule(this.roomId)
+      .pipe(finalize(() => this.isLoadingSchedule.set(false)))
+      .subscribe({
+        next: (schedule) => this.schedule.set(schedule),
+        error: (error: unknown) => this.scheduleError.set(
+          getAdminRequestErrorMessage(error, 'Nem sikerült betölteni a terem időbeosztását.'),
+        ),
+      });
+  }
+
+  formatDateTime(value: string): string {
+    return new Date(value).toLocaleString('hu-HU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  sortIntervals(intervals: TimeIntervalDto[]): TimeIntervalDto[] {
+    return [...intervals].sort(
+      (left, right) => new Date(left.startTime).getTime() - new Date(right.startTime).getTime(),
+    );
+  }
 
   updateStartDate(value: string): void {
     this.startDate = value;
@@ -64,6 +109,7 @@ export class AdminCreateMaintanceComponent {
         this.statusMessage.set('A karbantartás sikeresen létrejött.');
         this.statusIsError.set(false);
         this.isSubmitting.set(false);
+        this.loadSchedule();
       },
       error: (error: unknown) => {
         this.statusMessage.set(this.getErrorMessage(error));

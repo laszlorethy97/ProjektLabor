@@ -63,6 +63,35 @@
             />
           </div>
         </div>
+
+        <div class="maintenance-form__schedule" aria-label="A terem foglalásai és karbantartásai">
+          @if (isLoadingSchedule()) {
+            <p class="maintenance-form__schedule-message" role="status">Időbeosztás betöltése…</p>
+          } @else if (scheduleError()) {
+            <p class="maintenance-form__schedule-error" role="alert">{{ scheduleError() }}</p>
+          } @else {
+            <div>
+              <h3 class="maintenance-form__schedule-title">Foglalások</h3>
+              <ul class="maintenance-form__schedule-list">
+                @for (reservation of sortIntervals(schedule().reservations); track reservation.startTime + reservation.endTime) {
+                  <li>{{ formatDateTime(reservation.startTime) }} – {{ formatDateTime(reservation.endTime) }}</li>
+                } @empty {
+                  <li>Nincs foglalás.</li>
+                }
+              </ul>
+            </div>
+            <div>
+              <h3 class="maintenance-form__schedule-title">Karbantartások</h3>
+              <ul class="maintenance-form__schedule-list">
+                @for (maintenance of sortIntervals(schedule().maintenances); track maintenance.startTime + maintenance.endTime) {
+                  <li>{{ formatDateTime(maintenance.startTime) }} – {{ formatDateTime(maintenance.endTime) }}</li>
+                } @empty {
+                  <li>Nincs karbantartás.</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
       </section>
 
       <footer class="maintenance-form__footer admin-form-footer">

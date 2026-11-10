@@ -39,7 +39,27 @@ export class AdminCreateUserComponent {
   readonly statusIsError = signal(false);
   readonly isSubmitting = signal(false);
 
+  sanitizePinCode(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const pinCode = input.value.replace(/\D/g, '').slice(0, 6);
+    input.value = pinCode;
+    this.formData.pinCode = pinCode;
+  }
+
   requestData(): void {
+    const email = this.formData.email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.statusMessage.set('Érvényes e-mail-címet adj meg.');
+      this.statusIsError.set(true);
+      return;
+    }
+
+    if (!/^\d{6}$/.test(this.formData.pinCode)) {
+      this.statusMessage.set('A PIN-kód pontosan 6 számjegyből álljon.');
+      this.statusIsError.set(true);
+      return;
+    }
+
     const roles = this.roleOptions
       .filter((role) => this.formData.roles[role.key])
       .map((role) => role.key);
@@ -53,7 +73,7 @@ export class AdminCreateUserComponent {
     this.isSubmitting.set(true);
     this.statusMessage.set('');
     this.adminService.registerUser({
-      email: this.formData.email.trim(),
+      email,
       pinCode: this.formData.pinCode,
       password: this.formData.password,
       roles,
