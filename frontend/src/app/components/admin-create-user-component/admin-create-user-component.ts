@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AdminService } from '../../services/admin-service';
+import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
 import { ADMIN_ROLE_OPTIONS, type AdminRole } from '../admin-role-options';
 
 interface CreateUserForm {
@@ -17,6 +19,8 @@ interface CreateUserForm {
   styleUrl: './admin-create-user-component.scss',
 })
 export class AdminCreateUserComponent {
+  private readonly adminService = inject(AdminService);
+
   readonly roleOptions = ADMIN_ROLE_OPTIONS;
 
   formData: CreateUserForm = {
@@ -33,15 +37,40 @@ export class AdminCreateUserComponent {
 
   readonly statusMessage = signal('');
   readonly statusIsError = signal(false);
+  readonly isSubmitting = signal(false);
 
   requestData(): void {
-    if (!Object.values(this.formData.roles).some(Boolean)) {
+    const roles = this.roleOptions
+      .filter((role) => this.formData.roles[role.key])
+      .map((role) => role.key);
+
+    if (roles.length === 0) {
       this.statusMessage.set('Jelölj ki legalább egy szerepkört.');
       this.statusIsError.set(true);
       return;
     }
 
-    this.statusMessage.set('Az űrlap adatai érvényesek, de a regisztrációs végpont nincs bekötve; mentés nem történt.');
-    this.statusIsError.set(false);
+    this.isSubmitting.set(true);
+    this.statusMessage.set('');
+    this.adminService.registerUser({
+      email: this.formData.email.trim(),
+      pinCode: this.formData.pinCode,
+      password: this.formData.password,
+      roles,
+    }).subscribe({
+      next: () => {
+        this.statusMessage.set('A felhasználó regisztrációja sikeres.');
+        this.statusIsError.set(false);
+        this.isSubmitting.set(false);
+      },
+      error: (error: unknown) => {
+        this.statusMessage.set(getAdminRequestErrorMessage(
+          error,
+          'A felhasználó regisztrációja nem sikerült.',
+        ));
+        this.statusIsError.set(true);
+        this.isSubmitting.set(false);
+      },
+    });
   }
 }

@@ -149,6 +149,11 @@
     background-color 150ms ease,
     box-shadow 150ms ease;
 
+  &:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
   &:hover {
     background: #4269ad;
     box-shadow: 0 4px 12px #456ba933;
@@ -173,4 +178,8 @@
   margin-top: 0.9rem;
   color: #34745b;
   font-size: 0.8rem;
+}
+
+.masterkey-card__status--error {
+  color: #b42318;
 }

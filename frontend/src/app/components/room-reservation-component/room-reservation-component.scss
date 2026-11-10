@@ -71,6 +71,37 @@ $accent-soft: #e8ecf7;
   gap: utils.rem(10);
 }
 
+.reservation__schedule {
+  padding-bottom: utils.rem(20);
+  border-bottom: utils.rem(1) solid $line;
+}
+
+.reservation__schedule-group {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(6);
+}
+
+.reservation__schedule-heading {
+  font-size: utils.rem(13);
+  font-weight: 600;
+}
+
+.reservation__intervals {
+  display: flex;
+  flex-direction: column;
+  gap: utils.rem(6);
+  padding: 0;
+  color: $ink-soft;
+  font-size: utils.rem(13);
+  list-style: none;
+}
+
+.reservation__schedule-error {
+  color: #b42318;
+  font-size: utils.rem(14);
+}
+
 .reservation__label {
   font-size: utils.rem(14);
   font-weight: 600;

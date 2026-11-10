@@ -26,26 +26,24 @@
       </div>
       <h2 class="permission-card__title">Engedélyezett hozzáférés</h2>
       <p class="permission-card__description">
-        Az azonosítókat a rendszerben szereplő felhasználóhoz és mesterkulcshoz add meg.
+        A felhasználót e-mail-címével, a mesterkulcsot azonosítójával add meg.
       </p>
 
       <div class="permission-card__fields">
         <div class="permission-card__field">
-          <label class="permission-card__label" for="permission-user-id">Felhasználó azonosítója</label>
+          <label class="permission-card__label" for="permission-user-email">Felhasználó e-mail-címe</label>
           <input
             class="permission-card__input"
-            id="permission-user-id"
-            name="userId"
-            type="number"
-            min="1"
-            step="1"
-            inputmode="numeric"
-            placeholder="Például: 12"
+            id="permission-user-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="pelda@domain.hu"
             required
-            [ngModel]="userId()"
-            (ngModelChange)="userId.set($event)"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
           />
-          <span class="permission-card__hint">A felhasználó egyedi ID-ja.</span>
+          <span class="permission-card__hint">A felhasználó regisztrált e-mail-címe.</span>
         </div>
 
         <div class="permission-card__field">

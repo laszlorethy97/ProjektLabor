@@ -1,7 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace KeyManagement.Api.DTO;
 
 public class GrantMasterKeyPermissionDto
 {
-    public int UserId { get; set; }
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+
     public int MasterKeyId { get; set; }
 }

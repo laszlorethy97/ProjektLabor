@@ -117,8 +117,8 @@
         >
           {{ statusMessage() }}
         </p>
-        <button class="admin-form-submit" type="submit" [disabled]="userForm.invalid">
-          Regisztrációs adatok bekérése
+        <button class="admin-form-submit" type="submit" [disabled]="userForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Regisztráció...' : 'Felhasználó regisztrálása' }}
         </button>
       </footer>
     </form>

@@ -31,10 +31,10 @@ public class UserRoleController : ControllerBase
                 return Forbid();
             }
 
-            var userRoles = await _service.CreateUserRoleAsync(dto.UserId, dto.RoleIds, adminId);
+            var userRoles = await _service.CreateUserRoleAsync(dto.Email, dto.RoleIds, adminId);
             return Ok(new
             {
-                UserId = dto.UserId,
+                Email = dto.Email,
                 Roles = userRoles.Select(userRole => new
                 {
                     userRole.Role.Id,

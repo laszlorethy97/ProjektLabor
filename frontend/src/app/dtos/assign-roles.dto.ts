@@ -1,4 +1,4 @@
 export interface AssignRolesDto {
-  userId: number;
+  email: string;
   roleIds: number[];
 }

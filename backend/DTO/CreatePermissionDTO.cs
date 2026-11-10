@@ -4,8 +4,9 @@ namespace KeyManagement.Api.DTO;
 
 public class CreatePermissionDTO
 {
-    [Range(1, int.MaxValue)]
-    public int UserId { get; set; }
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
 
     [Range(1, int.MaxValue)]
     public int MasterKeyId { get; set; }

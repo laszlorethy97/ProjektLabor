@@ -1,5 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AdminService } from '../../services/admin-service';
+import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
 
 @Component({
   selector: 'app-admin-create-masterkey-component',
@@ -8,11 +10,33 @@ import { RouterLink } from '@angular/router';
   styleUrl: './admin-create-masterkey-component.scss',
 })
 export class AdminCreateMasterkeyComponent {
+  private readonly adminService = inject(AdminService);
+
   readonly statusMessage = signal('');
+  readonly statusIsError = signal(false);
+  readonly isSubmitting = signal(false);
 
   createMasterKey(): void {
-    this.statusMessage.set(
-      'A mesterkulcs-létrehozó végpont nincs bekötve; mentés nem történt.',
-    );
+    if (this.isSubmitting()) {
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.statusMessage.set('');
+    this.adminService.createMasterKey().subscribe({
+      next: () => {
+        this.statusMessage.set('A mesterkulcs sikeresen létrejött.');
+        this.statusIsError.set(false);
+        this.isSubmitting.set(false);
+      },
+      error: (error: unknown) => {
+        this.statusMessage.set(getAdminRequestErrorMessage(
+          error,
+          'A mesterkulcs létrehozása nem sikerült.',
+        ));
+        this.statusIsError.set(true);
+        this.isSubmitting.set(false);
+      },
+    });
   }
 }

@@ -4,7 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { finalize, map } from 'rxjs';
 import { RoomEquipmentDto } from '../../dtos/room-equipment.dto';
 import { RoomReservationDto } from '../../dtos/room-reservation.dto';
+import { RoomScheduleDto, TimeIntervalDto } from '../../dtos/room-schedule.dto';
 import { RoomReservationService } from '../../services/room-reservation-service';
+import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
 
 const FIRST_HOUR = 6;
 const LAST_HOUR = 22;
@@ -36,6 +38,11 @@ export class RoomReservationComponent implements OnInit {
   readonly hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i);
 
   readonly equipments = signal<RoomEquipmentDto[]>([]);
+  readonly schedule = signal<RoomScheduleDto>({ reservations: [], maintenances: [] });
+  readonly reservations = computed(() => this.sortIntervals(this.schedule().reservations));
+  readonly maintenances = computed(() => this.sortIntervals(this.schedule().maintenances));
+  readonly isLoadingSchedule = signal(false);
+  readonly scheduleError = signal('');
   readonly selectedDate = signal<Date | null>(null);
   readonly selectedHour = signal<number | null>(null);
   readonly selectedEquipmentIds = signal<number[]>([]);
@@ -84,6 +91,7 @@ export class RoomReservationComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEquipments();
+    this.loadSchedule();
   }
 
   loadEquipments(): void {
@@ -96,6 +104,25 @@ export class RoomReservationComponent implements OnInit {
       next: (equipments) => this.equipments.set(equipments),
       error: () => alert('Nem sikerült betölteni a felszereléseket'),
     });
+  }
+
+  loadSchedule(): void {
+    const roomId = this.roomId();
+    if (roomId === null) {
+      return;
+    }
+
+    this.isLoadingSchedule.set(true);
+    this.scheduleError.set('');
+    this.roomReservationService
+      .loadRoomSchedule(roomId)
+      .pipe(finalize(() => this.isLoadingSchedule.set(false)))
+      .subscribe({
+        next: (schedule) => this.schedule.set(schedule),
+        error: (error: unknown) => this.scheduleError.set(
+          getAdminRequestErrorMessage(error, 'Nem sikerült betölteni a terem időbeosztását.'),
+        ),
+      });
   }
 
   prevMonth(): void {
@@ -157,9 +184,28 @@ export class RoomReservationComponent implements OnInit {
       .createReservation(reservation)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: () => alert('Sikeres foglalás!'),
+        next: () => {
+          alert('Sikeres foglalás!');
+          this.loadSchedule();
+        },
         error: () => alert('Nem sikerült a foglalás'),
       });
+  }
+
+  formatDateTime(value: string): string {
+    return new Date(value).toLocaleString('hu-HU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  private sortIntervals(intervals: TimeIntervalDto[]): TimeIntervalDto[] {
+    return [...intervals].sort(
+      (left, right) => new Date(left.startTime).getTime() - new Date(right.startTime).getTime(),
+    );
   }
 
   private shiftMonth(delta: number): void {

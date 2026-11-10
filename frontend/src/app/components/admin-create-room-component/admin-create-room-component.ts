@@ -5,7 +5,7 @@ import { AdminService } from '../../services/admin-service';
 import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
 
 interface CreateRoomForm {
-  buildingId: number | null;
+  buildingName: string;
   roomName: string;
   capacity: number | null;
   equipment: string[];
@@ -21,7 +21,7 @@ export class AdminCreateRoomComponent {
   private readonly adminService = inject(AdminService);
 
   formData: CreateRoomForm = {
-    buildingId: null,
+    buildingName: '',
     roomName: '',
     capacity: null,
     equipment: [],
@@ -41,18 +41,17 @@ export class AdminCreateRoomComponent {
   }
 
   requestData(): void {
-    const { buildingId, capacity } = this.formData;
+    const buildingName = this.formData.buildingName.trim();
+    const { capacity } = this.formData;
     const name = this.formData.roomName.trim();
     if (
-      buildingId === null ||
+      !buildingName ||
       capacity === null ||
-      !Number.isInteger(buildingId) ||
       !Number.isInteger(capacity) ||
-      buildingId <= 0 ||
       capacity <= 0 ||
       !name
     ) {
-      this.statusMessage.set('Adj meg érvényes épületazonosítót, teremnevet és befogadóképességet.');
+      this.statusMessage.set('Adj meg érvényes épületnevet, teremnevet és befogadóképességet.');
       this.statusIsError.set(true);
       return;
     }
@@ -60,7 +59,7 @@ export class AdminCreateRoomComponent {
     this.isSubmitting.set(true);
     this.statusMessage.set('');
     this.adminService.createRoom({
-      buildingId,
+      buildingName,
       name,
       capacity,
       equipments: this.formData.equipment,

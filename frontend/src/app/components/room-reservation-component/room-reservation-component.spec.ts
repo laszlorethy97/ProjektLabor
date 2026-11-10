@@ -26,6 +26,7 @@ describe('RoomReservationComponent', () => {
     component = fixture.componentInstance;
     httpTesting = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
+    httpTesting.expectOne('/api/Room/schedule').flush({ reservations: [], maintenances: [] });
   });
 
   afterEach(() => {
@@ -52,6 +53,28 @@ describe('RoomReservationComponent', () => {
     expect(items.length).toBe(2);
   });
 
+  it('should list reservation and maintenance start and end times', () => {
+    httpTesting.expectOne('/api/Equipment/by-room-id/7').flush([]);
+    component.loadSchedule();
+    httpTesting.expectOne('/api/Room/schedule').flush({
+      reservations: [
+        { startTime: '2030-01-15T10:00:00Z', endTime: '2030-01-15T10:45:00Z' },
+      ],
+      maintenances: [
+        { startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T12:00:00Z' },
+      ],
+    });
+    fixture.detectChanges();
+
+    const pageText = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(pageText).toContain('Foglalások');
+    expect(pageText).toContain(component.formatDateTime('2030-01-15T10:00:00Z'));
+    expect(pageText).toContain(component.formatDateTime('2030-01-15T10:45:00Z'));
+    expect(pageText).toContain('Karbantartások');
+    expect(pageText).toContain(component.formatDateTime('2030-01-16T08:00:00Z'));
+    expect(pageText).toContain(component.formatDateTime('2030-01-16T12:00:00Z'));
+  });
+
   it('should send the selected day, hour and equipments on submit', () => {
     httpTesting.expectOne('/api/Equipment/by-room-id/7').flush([]);
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
@@ -65,6 +88,7 @@ describe('RoomReservationComponent', () => {
 
     const request = httpTesting.expectOne('/api/Reservation');
     request.flush(null);
+    httpTesting.expectOne('/api/Room/schedule').flush({ reservations: [], maintenances: [] });
 
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({

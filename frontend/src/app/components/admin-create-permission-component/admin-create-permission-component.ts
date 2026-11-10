@@ -13,31 +13,34 @@ import { getAdminRequestErrorMessage } from '../../services/admin-request-error'
 export class AdminCreatePermissionComponent {
   private readonly adminService = inject(AdminService);
 
-  readonly userId = signal<number | null>(null);
+  readonly email = signal('');
   readonly masterKeyId = signal<number | null>(null);
   readonly statusMessage = signal('');
   readonly statusIsError = signal(false);
   readonly isSaving = signal(false);
 
   createPermission(): void {
-    const userId = this.userId();
+    const email = this.email().trim();
     const masterKeyId = this.masterKeyId();
     if (
-      userId === null ||
       masterKeyId === null ||
-      !Number.isInteger(userId) ||
       !Number.isInteger(masterKeyId) ||
-      userId <= 0 ||
       masterKeyId <= 0
     ) {
-      this.statusMessage.set('Adj meg érvényes, pozitív egész azonosítókat.');
+      this.statusMessage.set('Adj meg érvényes adatokat.');
+      this.statusIsError.set(true);
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.statusMessage.set('Adj meg egy érvényes e-mail-címet.');
       this.statusIsError.set(true);
       return;
     }
 
     this.isSaving.set(true);
     this.statusMessage.set('');
-    this.adminService.createPermission({ userId, masterKeyId }).subscribe({
+    this.adminService.createPermission({ email, masterKeyId }).subscribe({
       next: () => {
         this.statusMessage.set('A mesterkulcs-használati engedély sikeresen létrejött.');
         this.statusIsError.set(false);

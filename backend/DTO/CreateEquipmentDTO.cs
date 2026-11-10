@@ -1,8 +1,15 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace KeyManagement.Api.DTO
 {
     public class CreateEquipmentDTO
     {
-        public int RoomId { get; set; }
-        public string Name { get; set; } = string.Empty;
+        [Required]
+        [StringLength(100)]
+        public string RoomName { get; set; } = string.Empty;
+
+        [Required]
+        [MinLength(1)]
+        public List<string> EquipmentNames { get; set; } = new();
     }
 }

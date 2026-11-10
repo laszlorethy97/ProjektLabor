@@ -34,7 +34,7 @@ public class PermissionController : ControllerBase
             return StatusCode(StatusCodes.Status201Created, new
             {
                 permission.Id,
-                UserId = dto.UserId,
+                Email = permission.User.Email,
                 MasterKeyId = dto.MasterKeyId,
                 permission.CreatedAt
             });

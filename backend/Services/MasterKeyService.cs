@@ -38,10 +38,11 @@ namespace KeyManagement.Api.Services
             return newMasterKey;
         }
 
-        public async Task<Permission> GrantMasterKeyPermissionAsync(int userId, int masterKeyId, int createdByUserId)
+        public async Task<Permission> GrantMasterKeyPermissionAsync(string email, int masterKeyId, int createdByUserId)
         {
-            
-            var user = await _context.Users.FindAsync(userId);
+            var normalizedEmail = email.Trim().ToLower();
+            var user = await _context.Users
+                .FirstOrDefaultAsync(candidate => candidate.Email.ToLower() == normalizedEmail);
             var masterKey = await _context.MasterKeys.FindAsync(masterKeyId);
             var createdByUser = await _context.Users.FindAsync(createdByUserId);
 
@@ -51,9 +52,9 @@ namespace KeyManagement.Api.Services
             }
 
             var permissionExists = await _context.Permissions
-                .AnyAsync(p => p.User.Id == userId && p.MasterKey.Id == masterKeyId);
+                .AnyAsync(p => p.User.Id == user.Id && p.MasterKey.Id == masterKeyId);
 
-            if (permissionExists!= null)
+            if (permissionExists)
             {
                 throw new InvalidOperationException("This user already has permission for this master key.");
             }
