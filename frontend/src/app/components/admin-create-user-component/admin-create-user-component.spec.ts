@@ -41,25 +41,55 @@ describe('AdminCreateUserComponent', () => {
     expect(element.querySelector('button[type="submit"]')).toBeTruthy();
   });
 
-  it('should require a role before confirming registration data', () => {
-    component.formData.email = 'new.user@example.com';
+  it('should require at least one role before registering', () => {
+    component.formData.email = 'user@example.com';
     component.formData.pinCode = '123456';
-    component.formData.password = 'secure-password';
     component.requestData();
 
     expect(component.statusMessage()).toBe('Jelölj ki legalább egy szerepkört.');
     expect(component.statusIsError()).toBe(true);
-
-    component.formData.roles.oktato = true;
-    component.requestData();
-
-    const request = httpTestingController.expectOne('/api/User/register');
-    request.flush({ message: 'User registered successfully.' }, { status: 201, statusText: 'Created' });
-    expect(component.statusMessage()).toBe('A felhasználó regisztrációja sikeres.');
-    expect(component.statusIsError()).toBe(false);
+    httpTestingController.expectNone('/api/User/register');
   });
 
-  it('submits the collected account details and selected roles', async () => {
+  it('should strip non-digits from the PIN and limit it to six digits', () => {
+    const input = document.createElement('input');
+    input.value = '12ab345678';
+    const event = new Event('input');
+    Object.defineProperty(event, 'target', { value: input });
+
+    component.sanitizePinCode(event);
+
+    expect(input.value).toBe('123456');
+    expect(component.formData.pinCode).toBe('123456');
+  });
+
+  it('should reject invalid email addresses and PINs even when submitted directly', () => {
+    component.formData = {
+      email: 'not-an-email',
+      pinCode: '12ab56',
+      password: 'valid-password',
+      roles: {
+        oktato: true,
+        portas: false,
+        admin: false,
+        'uzemeltetesi-igazgato': false,
+      },
+    };
+
+    component.requestData();
+
+    expect(component.statusMessage()).toBe('Érvényes e-mail-címet adj meg.');
+    expect(component.statusIsError()).toBe(true);
+    httpTestingController.expectNone('/api/User/register');
+
+    component.formData.email = 'user@example.com';
+    component.requestData();
+
+    expect(component.statusMessage()).toBe('A PIN-kód pontosan 6 számjegyből álljon.');
+    httpTestingController.expectNone('/api/User/register');
+  });
+
+  it('should register the entered account and selected roles', async () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -100,21 +130,26 @@ describe('AdminCreateUserComponent', () => {
     });
 
     const request = httpTestingController.expectOne('/api/User/register');
+    expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({
       email: 'uj.felhasznalo@example.com',
       pinCode: '123456',
       password: 'biztonsagos-jelszo',
       roles: ['admin'],
     });
-    request.flush({ message: 'User registered successfully.' }, { status: 201, statusText: 'Created' });
+    expect(component.isSubmitting()).toBe(true);
+    request.flush({ message: 'User registered successfully.' });
+
     expect(component.statusMessage()).toBe('A felhasználó regisztrációja sikeres.');
+    expect(component.statusIsError()).toBe(false);
+    expect(component.isSubmitting()).toBe(false);
   });
 
-  it('shows the backend conflict message for an already registered email', () => {
+  it('should show the backend error if registration fails', () => {
     component.formData = {
-      email: 'existing@example.com',
+      email: 'mar.regisztralt@example.com',
       pinCode: '123456',
-      password: 'secure-password',
+      password: 'biztonsagos-jelszo',
       roles: {
         oktato: true,
         portas: false,
@@ -124,14 +159,13 @@ describe('AdminCreateUserComponent', () => {
     };
 
     component.requestData();
-
-    const request = httpTestingController.expectOne('/api/User/register');
-    request.flush(
+    httpTestingController.expectOne('/api/User/register').flush(
       { message: 'This email address is already registered.' },
-      { status: 409, statusText: 'Conflict' },
+      { status: 400, statusText: 'Bad Request' },
     );
 
     expect(component.statusMessage()).toBe('This email address is already registered.');
     expect(component.statusIsError()).toBe(true);
+    expect(component.isSubmitting()).toBe(false);
   });
 });

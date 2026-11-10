@@ -39,7 +39,7 @@ describe('AdminRoomlistComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render rooms loaded from the tutor room endpoint', async () => {
+  it('should render rooms without schedule intervals', async () => {
     const rooms: RoomDto[] = [
       { roomId: 1, buildingName: 'A', roomName: 'I2', capacity: 30 },
       { roomId: 2, buildingName: 'B', roomName: '104', capacity: 80 },
@@ -47,9 +47,13 @@ describe('AdminRoomlistComponent', () => {
 
     httpTesting.expectOne('/api/Room/by-building').flush(rooms);
     await fixture.whenStable();
+    fixture.detectChanges();
 
-    expect(component.rooms()).toEqual(rooms);
-    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.admin-roomlist__item')).toHaveLength(2);
+    const element = fixture.nativeElement as HTMLElement;
+    expect(component.rooms()).toHaveLength(2);
+    expect(element.querySelectorAll('.admin-roomlist__item')).toHaveLength(2);
+    expect(element.textContent).not.toContain('Karbantartások');
+    httpTesting.expectNone('/api/Room/schedule');
   });
 
   it('should navigate to maintenance form with the selected room ID', async () => {

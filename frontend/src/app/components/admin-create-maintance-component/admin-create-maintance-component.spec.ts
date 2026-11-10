@@ -2,7 +2,6 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, ActivatedRoute } from '@angular/router';
-import { RoomScheduleDto } from '../../dtos/room-schedule.dto';
 
 import { AdminCreateMaintanceComponent } from './admin-create-maintance-component';
 
@@ -50,34 +49,46 @@ describe('AdminCreateMaintanceComponent', () => {
     component = fixture.componentInstance;
     httpTestingController = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
+    httpTestingController.expectOne('/api/Room/schedule').flush({ reservations: [], maintenances: [] });
     await fixture.whenStable();
   });
-
-  function flushSchedule(
-    schedule: RoomScheduleDto = { reservations: [], maintenances: [] },
-  ): void {
-    httpTestingController.expectOne('/api/Room/schedule/42').flush(schedule);
-  }
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
   it('should create', () => {
-    flushSchedule();
     expect(component).toBeTruthy();
   });
 
   it('should display the room ID from the route', () => {
-    flushSchedule();
     fixture.detectChanges();
 
     expect(component.roomId).toBe(42);
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('42. terem');
   });
 
+  it('should show the selected room schedule beside the maintenance time fields', () => {
+    component.loadSchedule();
+    httpTestingController.expectOne('/api/Room/schedule').flush({
+      reservations: [
+        { startTime: '2030-01-15T10:00:00Z', endTime: '2030-01-15T11:00:00Z' },
+      ],
+      maintenances: [
+        { startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T12:00:00Z' },
+      ],
+    });
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('.maintenance-form__schedule')).toBeTruthy();
+    expect(element.textContent).toContain('Foglalások');
+    expect(element.textContent).toContain('Karbantartások');
+    expect(element.textContent).toContain(component.formatDateTime('2030-01-15T10:00:00Z'));
+    expect(element.textContent).toContain(component.formatDateTime('2030-01-16T12:00:00Z'));
+  });
+
   it('should require a valid increasing from-to date and time period', () => {
-    flushSchedule();
     component.requestMaintenance();
 
     expect(component.statusMessage()).toBe('Add meg a karbantartás kezdő és záró időpontját.');
@@ -99,7 +110,6 @@ describe('AdminCreateMaintanceComponent', () => {
   });
 
   it('should reject a start time in the past without sending a request', () => {
-    flushSchedule();
     component.startDate = formatLocalDateTime(new Date(Date.now() - 60_000));
     component.endDate = futureDateTime(10, 0);
 
@@ -111,7 +121,6 @@ describe('AdminCreateMaintanceComponent', () => {
   });
 
   it('should send the route room ID and selected time interval to the backend', () => {
-    flushSchedule();
     component.startDate = futureDateTime(10, 0);
     component.endDate = futureDateTime(11, 0);
     component.requestMaintenance();
@@ -125,11 +134,14 @@ describe('AdminCreateMaintanceComponent', () => {
     });
     expect(component.isSubmitting()).toBe(true);
     request.flush({ message: 'Maintenance created successfully.' });
+    httpTestingController.expectOne('/api/Room/schedule').flush({
+      reservations: [],
+      maintenances: [],
+    });
 
     expect(component.statusMessage()).toBe('A karbantartás sikeresen létrejött.');
     expect(component.statusIsError()).toBe(false);
     expect(component.isSubmitting()).toBe(false);
-    flushSchedule();
     fixture.detectChanges();
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(
       'A karbantartás sikeresen létrejött.',
@@ -137,7 +149,6 @@ describe('AdminCreateMaintanceComponent', () => {
   });
 
   it('should show the backend error when maintenance creation fails', () => {
-    flushSchedule();
     component.startDate = futureDateTime(10, 0);
     component.endDate = futureDateTime(11, 0);
     component.requestMaintenance();
@@ -153,7 +164,6 @@ describe('AdminCreateMaintanceComponent', () => {
   });
 
   it('should render date-time fields with minute precision', () => {
-    flushSchedule();
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -165,21 +175,5 @@ describe('AdminCreateMaintanceComponent', () => {
     expect(endInput?.getAttribute('type')).toBe('datetime-local');
     expect(endInput?.getAttribute('step')).toBe('60');
     expect(startInput?.getAttribute('min')).toBe(component.minimumStartDateTime());
-  });
-
-  it('shows the room reservations and maintenance intervals', () => {
-    const schedule = {
-      reservations: [{ startTime: '2030-01-15T10:00:00Z', endTime: '2030-01-15T10:45:00Z' }],
-      maintenances: [{ startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T09:00:00Z' }],
-    };
-    flushSchedule(schedule);
-    fixture.detectChanges();
-
-    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Foglalások');
-    expect(text).toContain('Karbantartások');
-    expect(text).toContain('2030');
-    expect(component.reservations()).toEqual(schedule.reservations);
-    expect(component.maintenances()).toEqual(schedule.maintenances);
   });
 });

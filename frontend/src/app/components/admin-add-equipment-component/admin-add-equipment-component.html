@@ -13,7 +13,7 @@
       </div>
       <h1 class="equipment-page__title">Felszerelési igény hozzáadása</h1>
       <p class="equipment-page__subtitle">
-        Add meg a terem azonosítóját, majd sorold fel vesszővel elválasztva a kért felszereléseket.
+        Add meg a terem nevét, majd sorold fel vesszővel elválasztva a kért felszereléseket.
       </p>
     </header>
 
@@ -31,20 +31,18 @@
 
       <div class="equipment-card__fields">
         <div class="equipment-card__field">
-          <label class="equipment-card__label" for="equipment-room-id">Terem azonosítója *</label>
+          <label class="equipment-card__label" for="equipment-room-name">Terem neve *</label>
           <input
             class="equipment-card__input"
-            id="equipment-room-id"
-            name="roomId"
-            type="number"
-            min="1"
-            step="1"
-            inputmode="numeric"
-            placeholder="Például: 7"
+            id="equipment-room-name"
+            name="roomName"
+            type="text"
+            autocomplete="off"
+            placeholder="Például: 204-es terem"
             required
-            [(ngModel)]="formData.roomId"
+            [(ngModel)]="formData.roomName"
           />
-          <span class="equipment-card__hint">Annak a teremnek az egyedi ID-ja, amelyhez az igény tartozik.</span>
+          <span class="equipment-card__hint">Annak a teremnek a neve, amelyhez az igény tartozik.</span>
         </div>
 
         <div class="equipment-card__field">
@@ -87,7 +85,7 @@
           {{ statusMessage() }}
         </p>
         <button class="equipment-card__submit" type="submit" [disabled]="equipmentForm.invalid || isSubmitting()">
-          {{ isSubmitting() ? 'Mentés folyamatban…' : 'Felszerelési igény hozzáadása' }}
+          {{ isSubmitting() ? 'Mentés...' : 'Felszerelési igény mentése' }}
         </button>
       </footer>
     </form>

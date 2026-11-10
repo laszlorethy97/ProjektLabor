@@ -1,4 +1,4 @@
 export interface CreateEquipmentDto {
-  roomId: number;
-  name: string;
+  roomName: string;
+  equipmentNames: string[];
 }

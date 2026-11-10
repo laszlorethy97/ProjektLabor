@@ -11,7 +11,7 @@
     <p class="admin-roomlist__message" role="status">Termek betöltése…</p>
   } @else if (loadError()) {
     <div class="admin-roomlist__message admin-roomlist__message--error" role="alert">
-      <p>Nem sikerült betölteni a termeket.</p>
+      <p>Nem sikerült betölteni a termeket és karbantartásokat.</p>
       <button class="admin-roomlist__retry" type="button" (click)="loadRooms()">Újrapróbálás</button>
     </div>
   } @else {

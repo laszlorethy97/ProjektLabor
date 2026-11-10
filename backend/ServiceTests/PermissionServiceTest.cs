@@ -29,7 +29,7 @@ public class PermissionServiceTest
 
         var service = new PermissionService(context);
         var permission = await service.CreatePermissionAsync(
-            new CreatePermissionDTO { UserId = user.Id, MasterKeyId = masterKey.Id },
+            new CreatePermissionDTO { Email = user.Email.ToUpperInvariant(), MasterKeyId = masterKey.Id },
             admin.Id);
 
         Assert.Equal(user.Id, permission.User.Id);
@@ -59,10 +59,31 @@ public class PermissionServiceTest
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.CreatePermissionAsync(
-                new CreatePermissionDTO { UserId = user.Id, MasterKeyId = masterKey.Id },
+                new CreatePermissionDTO { Email = user.Email, MasterKeyId = masterKey.Id },
                 admin.Id));
 
         Assert.Equal("User already has permission to use this master key.", exception.Message);
         Assert.Single(await context.Permissions.ToListAsync());
+    }
+
+    [Fact]
+    public async Task CreatePermissionAsyncWhenEmailDoesNotMatchAUserThrowsNotFound()
+    {
+        using var context = new KeyManagementDbContext(GetOptions());
+        var admin = new User { Id = 2, Email = "admin@test.hu" };
+        var masterKey = new MasterKey { Id = 3, CreatedBy = admin };
+        context.Users.Add(admin);
+        context.MasterKeys.Add(masterKey);
+        await context.SaveChangesAsync();
+
+        var service = new PermissionService(context);
+
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            service.CreatePermissionAsync(
+                new CreatePermissionDTO { Email = "missing@test.hu", MasterKeyId = masterKey.Id },
+                admin.Id));
+
+        Assert.Equal("User not found.", exception.Message);
+        Assert.Empty(await context.Permissions.ToListAsync());
     }
 }

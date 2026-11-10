@@ -4,10 +4,12 @@ namespace KeyManagement.Api.DTO
 {
     public class CreateEquipmentDTO
     {
-        [Range(1, int.MaxValue)]
-        public int RoomId { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string RoomName { get; set; } = string.Empty;
 
-        [Required, StringLength(100)]
-        public string Name { get; set; } = string.Empty;
+        [Required]
+        [MinLength(1)]
+        public List<string> EquipmentNames { get; set; } = new();
     }
 }

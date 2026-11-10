@@ -31,17 +31,16 @@
 
         <div class="room-form__fields">
           <div class="room-form__field">
-            <label class="room-form__label" for="building-id">Épületazonosító *</label>
+            <label class="room-form__label" for="building-name">Épület neve *</label>
             <input
               class="room-form__input"
-              id="building-id"
-              name="buildingId"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Például: 1"
+              id="building-name"
+              name="buildingName"
+              type="text"
+              placeholder="Például: A épület"
+              autocomplete="off"
               required
-              [(ngModel)]="formData.buildingId"
+              [(ngModel)]="formData.buildingName"
             />
           </div>
 

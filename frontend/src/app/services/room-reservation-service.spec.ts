@@ -40,15 +40,16 @@ describe('RoomReservationService', () => {
   it('should load reservations and maintenances for the given room', () => {
     const schedule: RoomScheduleDto = {
       reservations: [{ startTime: '2030-01-15T10:00:00Z', endTime: '2030-01-15T10:45:00Z' }],
-      maintenances: [{ startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T09:00:00Z' }],
+      maintenances: [{ startTime: '2030-01-16T08:00:00Z', endTime: '2030-01-16T12:00:00Z' }],
     };
     let result: RoomScheduleDto | undefined;
 
-    service.loadRoomSchedule(7).subscribe((res) => (result = res));
-    const request = httpTesting.expectOne('/api/Room/schedule/7');
-    expect(request.request.method).toBe('GET');
+    service.loadRoomSchedule(7).subscribe((response) => (result = response));
+    const request = httpTesting.expectOne('/api/Room/schedule');
     request.flush(schedule);
 
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ roomId: 7 });
     expect(result).toEqual(schedule);
   });
 

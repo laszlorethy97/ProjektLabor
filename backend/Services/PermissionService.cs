@@ -16,7 +16,9 @@ namespace KeyManagement.Api.Services
 
         public async Task<Permission> CreatePermissionAsync(CreatePermissionDTO dto, int createdByUserId)
         {
-            var user = await _context.Users.FindAsync(dto.UserId);
+            var normalizedEmail = dto.Email.Trim().ToLower();
+            var user = await _context.Users
+                .FirstOrDefaultAsync(candidate => candidate.Email.ToLower() == normalizedEmail);
             if (user == null)
             {
                 throw new KeyNotFoundException("User not found.");

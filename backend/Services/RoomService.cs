@@ -78,19 +78,23 @@ namespace KeyManagement.Api.Services
             if (roomExists)
                 return (false, "A room with this name already exists.");
 
-            Building? building = await _context.Buildings
-                .FirstOrDefaultAsync(b => b.Id == dto.BuildingId);
+            string requestedBuildingName = dto.BuildingName.Trim();
+            if (string.IsNullOrWhiteSpace(requestedBuildingName))
+                return (false, "Building name cannot be empty.");
 
-            if (building == null)
+            string normalizedBuildingName = requestedBuildingName.ToUpperInvariant();
+            List<Building> matchingBuildings = await _context.Buildings
+                .Where(b => b.Name.ToUpper() == normalizedBuildingName)
+                .Take(2)
+                .ToListAsync();
+
+            if (matchingBuildings.Count == 0)
                 return (false, "Building not found.");
 
-            string normalizedBuildingName = building.Name.ToUpperInvariant();
-            bool duplicateBuildingName = await _context.Buildings.AnyAsync(
-                b => b.Id != building.Id && b.Name.ToUpper() == normalizedBuildingName);
-
-            if (duplicateBuildingName)
+            if (matchingBuildings.Count > 1)
                 return (false, "A building with this name already exists.");
 
+            Building building = matchingBuildings[0];
             User? user = await _context.Users.FindAsync(userId);
 
             if (user == null)

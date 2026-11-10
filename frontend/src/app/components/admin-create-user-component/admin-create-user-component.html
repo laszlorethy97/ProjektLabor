@@ -38,6 +38,7 @@
               placeholder="pelda@email.com"
               autocomplete="email"
               required
+              email
               [(ngModel)]="formData.email"
             />
           </div>
@@ -56,6 +57,7 @@
               autocomplete="new-password"
               required
               [(ngModel)]="formData.pinCode"
+              (input)="sanitizePinCode($event)"
             />
             <span class="user-form__hint">A PIN-kód pontosan 6 számjegyből álljon.</span>
           </div>
@@ -118,7 +120,7 @@
           {{ statusMessage() }}
         </p>
         <button class="admin-form-submit" type="submit" [disabled]="userForm.invalid || isSubmitting()">
-          {{ isSubmitting() ? 'Regisztráció folyamatban…' : 'Felhasználó regisztrálása' }}
+          {{ isSubmitting() ? 'Regisztráció...' : 'Felhasználó regisztrálása' }}
         </button>
       </footer>
     </form>

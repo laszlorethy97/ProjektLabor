@@ -1,4 +1,4 @@
 export interface CreatePermissionDto {
-  userId: number;
+  email: string;
   masterKeyId: number;
 }

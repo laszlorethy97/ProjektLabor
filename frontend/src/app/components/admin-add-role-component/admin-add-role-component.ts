@@ -6,7 +6,7 @@ import { getAdminRequestErrorMessage } from '../../services/admin-request-error'
 import { ADMIN_ROLE_OPTIONS, AdminRole } from '../admin-role-options';
 
 interface RoleAssignmentForm {
-  userId: number | null;
+  email: string;
   roles: Record<AdminRole, boolean>;
 }
 
@@ -19,11 +19,10 @@ interface RoleAssignmentForm {
 export class AdminAddRoleComponent {
   private readonly adminService = inject(AdminService);
 
-  readonly availableUserIds = Array.from({ length: 10 }, (_, index) => index + 1);
   readonly roleOptions = ADMIN_ROLE_OPTIONS;
 
   formData: RoleAssignmentForm = {
-    userId: null,
+    email: '',
     roles: {
       oktato: false,
       portas: false,
@@ -37,9 +36,9 @@ export class AdminAddRoleComponent {
   readonly isSubmitting = signal(false);
 
   requestData(): void {
-    const userId = this.formData.userId;
-    if (userId === null || !Number.isInteger(userId) || userId <= 0) {
-      this.statusMessage.set('Adj meg egy érvényes felhasználói azonosítót.');
+    const email = this.formData.email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.statusMessage.set('Adj meg egy érvényes e-mail-címet.');
       this.statusIsError.set(true);
       return;
     }
@@ -54,7 +53,7 @@ export class AdminAddRoleComponent {
     }
 
     this.isSubmitting.set(true);
-    this.adminService.assignRoles({ userId, roleIds }).subscribe({
+    this.adminService.assignRoles({ email, roleIds }).subscribe({
       next: () => {
         this.statusMessage.set('A szerepkörök hozzárendelése sikeres.');
         this.statusIsError.set(false);

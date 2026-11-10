@@ -35,14 +35,16 @@
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 5v14m-7-7h14"></path>
         </svg>
-        Mesterkulcs létrehozása
+        {{ isSubmitting() ? 'Létrehozás...' : 'Mesterkulcs létrehozása' }}
       </button>
       <p
         class="masterkey-card__status"
         [class.masterkey-card__status--error]="statusIsError()"
         role="status"
         aria-live="polite"
-      >{{ statusMessage() }}</p>
+      >
+        {{ statusMessage() }}
+      </p>
     </section>
   </div>
 </main>

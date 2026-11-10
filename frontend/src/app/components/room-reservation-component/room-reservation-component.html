@@ -1,24 +1,13 @@
 <form class="reservation" (submit)="$event.preventDefault(); submit()">
   <header class="reservation__header">
-    <span class="reservation__eyebrow">TEREMHASZNÁLAT</span>
     <h1 class="reservation__title">Terem foglalása</h1>
     <p class="reservation__subtitle">Válassz napot, időpontot és a szükséges felszereléseket.</p>
   </header>
 
   <div class="reservation__card">
-    <div class="reservation__card-heading">
-      <div>
-        <h2 class="reservation__card-title">Foglalási adatok</h2>
-        <p class="reservation__card-subtitle">A kiválasztott idősáv 45 perces.</p>
-      </div>
-      <span class="reservation__room-badge">Terem {{ roomId() }}</span>
-    </div>
+    <section class="reservation__section">
+      <h2 class="reservation__label">Nap</h2>
 
-    <section class="reservation__section reservation__section--calendar">
-      <div class="reservation__section-heading">
-        <h2 class="reservation__label">Válassz napot</h2>
-        <span class="reservation__hint">A szürke napokon nincs szabad időpont</span>
-      </div>
       <div class="calendar">
         <div class="calendar__nav">
           <button
@@ -47,8 +36,7 @@
               [class.calendar__day--outside]="!day.inMonth"
               [class.calendar__day--today]="isToday(day)"
               [class.calendar__day--selected]="isSelected(day)"
-              [class.calendar__day--unavailable]="isDateUnavailable(day)"
-              [disabled]="day.disabled || isDateUnavailable(day)"
+              [disabled]="day.disabled"
               (click)="selectDate(day)"
             >
               {{ day.date.getDate() }}
@@ -58,106 +46,66 @@
       </div>
     </section>
 
-    <div class="reservation__details">
-      <section class="reservation__section">
-        <label class="reservation__label" for="reservation-hour">Időpont</label>
-        <select
-          id="reservation-hour"
-          class="reservation__select"
-          [disabled]="!selectedDate() || isScheduleLoading() || !!scheduleError()"
-          (change)="onHourChange($event)"
-        >
-          <option value="" [selected]="selectedHour() === null">Válassz időpontot…</option>
-          @for (hour of hours; track hour) {
-            <option
-              [value]="hour"
-              [selected]="selectedHour() === hour"
-              [disabled]="isHourUnavailable(hour)"
-            >{{ formatHour(hour) }}{{ isHourUnavailable(hour) ? ' · foglalt' : '' }}</option>
+    <section class="reservation__section">
+      <label class="reservation__label" for="reservation-hour">Időpont</label>
+      <select id="reservation-hour" class="reservation__select" (change)="onHourChange($event)">
+        <option value="" [selected]="selectedHour() === null">Válassz időpontot…</option>
+        @for (hour of hours; track hour) {
+          <option [value]="hour" [selected]="selectedHour() === hour">{{ formatHour(hour) }}</option>
+        }
+      </select>
+      @if (selectedDate()) {
+        <div class="reservation__schedule" aria-label="A kiválasztott nap foglalásai és karbantartásai">
+          @if (isLoadingSchedule()) {
+            <p class="reservation__empty" role="status">Időbeosztás betöltése...</p>
+          } @else if (scheduleError()) {
+            <p class="reservation__schedule-error" role="alert">{{ scheduleError() }}</p>
+          } @else {
+            <div class="reservation__schedule-group">
+              <h3 class="reservation__schedule-heading">Foglalások</h3>
+              <ul class="reservation__intervals">
+                @for (reservation of reservationsForSelectedDate(); track reservation.startTime + reservation.endTime) {
+                  <li>{{ formatTimeRange(reservation) }}</li>
+                } @empty {
+                  <li class="reservation__empty">Nincs foglalás ezen a napon.</li>
+                }
+              </ul>
+            </div>
+            <div class="reservation__schedule-group">
+              <h3 class="reservation__schedule-heading">Karbantartások</h3>
+              <ul class="reservation__intervals">
+                @for (maintenance of maintenancesForSelectedDate(); track maintenance.startTime + maintenance.endTime) {
+                  <li>{{ formatTimeRange(maintenance) }}</li>
+                } @empty {
+                  <li class="reservation__empty">Nincs karbantartás ezen a napon.</li>
+                }
+              </ul>
+            </div>
           }
-        </select>
-      </section>
-
-      <section class="reservation__section">
-        <div>
-          <h2 class="reservation__label">Felszerelések</h2>
-          <p class="reservation__hint">Jelöld be, amit használni szeretnél.</p>
         </div>
-        <ul class="reservation__equipments">
-          @for (equipment of equipments(); track equipment.id) {
-            <li>
-              <label class="reservation__checkbox">
-                <input
-                  type="checkbox"
-                  [checked]="isEquipmentSelected(equipment.id)"
-                  (change)="toggleEquipment(equipment.id, $any($event.target).checked)"
-                />
-                <span>{{ equipment.name }}</span>
-              </label>
-            </li>
-          } @empty {
-            <li class="reservation__empty">Nincs elérhető felszerelés.</li>
-          }
-        </ul>
-      </section>
+      }
+    </section>
 
-      <p
-        class="reservation__status"
-        [class.reservation__status--error]="statusIsError()"
-        role="status"
-        aria-live="polite"
-      >{{ statusMessage() }}</p>
-      <button
-        type="submit"
-        class="reservation__submit"
-        [disabled]="!reservation() || isSubmitting() || isScheduleLoading() || !!scheduleError()"
-      >{{ isSubmitting() ? 'Foglalás folyamatban…' : 'Foglalás' }}</button>
-    </div>
+    <section class="reservation__section">
+      <h2 class="reservation__label">Felszerelések</h2>
+      <ul class="reservation__equipments">
+        @for (equipment of equipments(); track equipment.id) {
+          <li>
+            <label class="reservation__checkbox">
+              <input
+                type="checkbox"
+                [checked]="isEquipmentSelected(equipment.id)"
+                (change)="toggleEquipment(equipment.id, $any($event.target).checked)"
+              />
+              <span>{{ equipment.name }}</span>
+            </label>
+          </li>
+        } @empty {
+          <li class="reservation__empty">Nincs elérhető felszerelés.</li>
+        }
+      </ul>
+    </section>
+
+    <button type="submit" class="reservation__submit" [disabled]="!reservation() || isSubmitting()">Foglalás</button>
   </div>
-
-  <section class="reservation__schedule" aria-labelledby="room-schedule-title">
-    <div class="reservation__schedule-heading">
-      <div>
-        <h2 id="room-schedule-title">A terem foglaltsága</h2>
-        <p>Az időpontválasztó a foglalt idősávokat automatikusan letiltja.</p>
-      </div>
-      <button
-        type="button"
-        class="reservation__refresh"
-        [disabled]="isScheduleLoading()"
-        (click)="loadRoomSchedule()"
-      >{{ isScheduleLoading() ? 'Betöltés…' : 'Frissítés' }}</button>
-    </div>
-
-    @if (isScheduleLoading() && !roomSchedule()) {
-      <p class="reservation__schedule-message" role="status">Foglaltsági adatok betöltése…</p>
-    } @else if (scheduleError()) {
-      <p class="reservation__schedule-message reservation__schedule-message--error" role="alert">
-        {{ scheduleError() }}
-      </p>
-    } @else {
-      <div class="reservation__schedule-columns">
-        <section class="reservation__schedule-group reservation__schedule-group--booking">
-          <h3>Foglalások <span>{{ roomSchedule()?.reservations?.length ?? 0 }}</span></h3>
-          <ul>
-            @for (reservation of roomSchedule()?.reservations ?? []; track $index) {
-              <li>{{ formatInterval(reservation) }}</li>
-            } @empty {
-              <li class="reservation__schedule-empty">Még nincs rögzített foglalás.</li>
-            }
-          </ul>
-        </section>
-        <section class="reservation__schedule-group reservation__schedule-group--maintenance">
-          <h3>Karbantartások <span>{{ roomSchedule()?.maintenances?.length ?? 0 }}</span></h3>
-          <ul>
-            @for (maintenance of roomSchedule()?.maintenances ?? []; track $index) {
-              <li>{{ formatInterval(maintenance) }}</li>
-            } @empty {
-              <li class="reservation__schedule-empty">Még nincs rögzített karbantartás.</li>
-            }
-          </ul>
-        </section>
-      </div>
-    }
-  </section>
 </form>

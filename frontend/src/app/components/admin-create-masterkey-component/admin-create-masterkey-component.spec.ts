@@ -39,29 +39,36 @@ describe('AdminCreateMasterkeyComponent', () => {
     expect(pageText).not.toContain('adatküldés nem történik');
   });
 
-  it('creates a master key and displays success feedback', () => {
+  it('should create a master key and display success', () => {
     fixture.detectChanges();
 
-    const button = (fixture.nativeElement as HTMLElement).querySelector('button');
+    const element = fixture.nativeElement as HTMLElement;
+    const button = element.querySelector('button');
     expect(button).toBeTruthy();
     button?.click();
 
     const request = httpTestingController.expectOne('/api/MasterKey/create');
     expect(request.request.method).toBe('POST');
-    request.flush({ id: 1 }, { status: 201, statusText: 'Created' });
+    expect(request.request.body).toEqual({});
+    expect(component.isSubmitting()).toBe(true);
+    request.flush({ id: 5 });
 
     expect(component.statusMessage()).toBe('A mesterkulcs sikeresen létrejött.');
     expect(component.statusIsError()).toBe(false);
     expect(component.isSubmitting()).toBe(false);
+    fixture.detectChanges();
+    expect(element.textContent).toContain('A mesterkulcs sikeresen létrejött.');
   });
 
-  it('displays the backend error when master key creation fails', () => {
+  it('should display an error if master key creation fails', () => {
     component.createMasterKey();
 
-    const request = httpTestingController.expectOne('/api/MasterKey/create');
-    request.flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+    httpTestingController.expectOne('/api/MasterKey/create').flush(
+      { message: 'Administrator not found.' },
+      { status: 404, statusText: 'Not Found' },
+    );
 
-    expect(component.statusMessage()).toBe('Forbidden');
+    expect(component.statusMessage()).toBe('Administrator not found.');
     expect(component.statusIsError()).toBe(true);
     expect(component.isSubmitting()).toBe(false);
   });

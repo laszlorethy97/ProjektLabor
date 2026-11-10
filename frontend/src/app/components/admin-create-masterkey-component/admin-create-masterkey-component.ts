@@ -32,7 +32,7 @@ export class AdminCreateMasterkeyComponent {
       error: (error: unknown) => {
         this.statusMessage.set(getAdminRequestErrorMessage(
           error,
-          'Nem sikerült létrehozni a mesterkulcsot.',
+          'A mesterkulcs létrehozása nem sikerült.',
         ));
         this.statusIsError.set(true);
         this.isSubmitting.set(false);

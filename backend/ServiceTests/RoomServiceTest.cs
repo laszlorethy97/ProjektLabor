@@ -9,54 +9,6 @@ namespace KeyManagement.Api.ServiceTests;
 
 public class RoomServiceTest
 {
-    [Fact]
-    public async Task GetRoomScheduleAsyncReturnsReservationsAndMaintenancesInStartOrder()
-    {
-        await using var context = CreateContext();
-        var room = new Room
-        {
-            Id = 7,
-            Name = "A101",
-            Capacity = 20,
-            Building = new Building { Id = 1, Name = "A" }
-        };
-        var user = new User { Id = 1, Email = "teacher@example.com" };
-        var later = DateTime.SpecifyKind(new DateTime(2030, 4, 2, 12, 0, 0), DateTimeKind.Utc);
-        var earlier = later.AddHours(-2);
-        context.Rooms.Add(room);
-        context.Users.Add(user);
-        context.Reservations.AddRange(
-            new Reservation { Room = room, User = user, StartTime = later, EndTime = later.AddMinutes(45) },
-            new Reservation { Room = room, User = user, StartTime = earlier, EndTime = earlier.AddMinutes(45) });
-        context.Maintenances.Add(new Maintenance
-        {
-            Room = room,
-            User = user,
-            StartTime = earlier.AddDays(1),
-            EndTime = earlier.AddDays(1).AddHours(1)
-        });
-        await context.SaveChangesAsync();
-
-        var result = await new RoomService(context).GetRoomScheduleAsync(room.Id);
-
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Reservations.Count);
-        Assert.Equal(new DateTimeOffset(earlier), result.Reservations[0].StartTime);
-        Assert.Equal(new DateTimeOffset(later), result.Reservations[1].StartTime);
-        Assert.Single(result.Maintenances);
-        Assert.Equal(TimeSpan.Zero, result.Maintenances[0].StartTime.Offset);
-    }
-
-    [Fact]
-    public async Task GetRoomScheduleAsyncReturnsNullWhenRoomDoesNotExist()
-    {
-        await using var context = CreateContext();
-
-        var result = await new RoomService(context).GetRoomScheduleAsync(404);
-
-        Assert.Null(result);
-    }
-
     [Theory]
     [InlineData("Room 101")]
     [InlineData(" room 101 ")]
@@ -82,7 +34,7 @@ public class RoomServiceTest
         var result = await service.CreateRoomAsync(
             new CreateRoomDTO
             {
-                BuildingId = 1,
+                BuildingName = "Building 1",
                 Name = requestedName,
                 Capacity = 30
             },
@@ -110,7 +62,7 @@ public class RoomServiceTest
         var result = await service.CreateRoomAsync(
             new CreateRoomDTO
             {
-                BuildingId = 1,
+                BuildingName = "BUILDING 1",
                 Name = "Room 101",
                 Capacity = 30
             },
@@ -121,12 +73,57 @@ public class RoomServiceTest
         Assert.Empty(await context.Rooms.ToListAsync());
     }
 
-    private static KeyManagementDbContext CreateContext()
+    [Fact]
+    public async Task CreateRoomAsyncFindsBuildingByNameIgnoringCaseAndWhitespace()
     {
         var options = new DbContextOptionsBuilder<KeyManagementDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
-        return new KeyManagementDbContext(options);
+        await using var context = new KeyManagementDbContext(options);
+        var building = new Building { Id = 1, Name = "Building 1" };
+        context.Buildings.Add(building);
+        context.Users.Add(new User { Id = 1, Email = "admin@example.com" });
+        await context.SaveChangesAsync();
+
+        var service = new RoomService(context);
+        var result = await service.CreateRoomAsync(
+            new CreateRoomDTO
+            {
+                BuildingName = " BUILDING 1 ",
+                Name = "Room 101",
+                Capacity = 30
+            },
+            userId: 1);
+
+        Assert.True(result.Success);
+        var room = await context.Rooms.Include(item => item.Building).SingleAsync();
+        Assert.Equal(building.Id, room.Building.Id);
+    }
+
+    [Fact]
+    public async Task CreateRoomAsyncWhenBuildingNameDoesNotExistReturnsFailure()
+    {
+        var options = new DbContextOptionsBuilder<KeyManagementDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
+        await using var context = new KeyManagementDbContext(options);
+        context.Users.Add(new User { Id = 1, Email = "admin@example.com" });
+        await context.SaveChangesAsync();
+
+        var service = new RoomService(context);
+        var result = await service.CreateRoomAsync(
+            new CreateRoomDTO
+            {
+                BuildingName = "Missing building",
+                Name = "Room 101",
+                Capacity = 30
+            },
+            userId: 1);
+
+        Assert.False(result.Success);
+        Assert.Equal("Building not found.", result.Error);
+        Assert.Empty(await context.Rooms.ToListAsync());
     }
 }

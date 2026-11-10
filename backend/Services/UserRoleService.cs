@@ -38,10 +38,12 @@ namespace KeyManagement.Api.Services
             return CreatedByUserId ;
         }
     
-        public async Task<List<UserRole>> CreateUserRoleAsync(int userId, List<int> roleIds, int createdByUserId)
+        public async Task<List<UserRole>> CreateUserRoleAsync(string email, List<int> roleIds, int createdByUserId)
         {
 
-            var user = await _context.Users.FindAsync(userId);
+            var normalizedEmail = email.Trim().ToLower();
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
             var createdByUser = await _context.Users.FindAsync(createdByUserId);
 
             if (user == null || createdByUser == null)
@@ -61,7 +63,7 @@ namespace KeyManagement.Api.Services
 
             var existingUserRoles = await _context.UserRoles
                 .Include(ur => ur.Role)
-                .Where(ur => ur.User.Id == userId)
+                .Where(ur => ur.User.Id == user.Id)
                 .ToListAsync();
 
             var existingRoleIds = existingUserRoles.Select(ur => ur.Role.Id).ToList();
@@ -100,7 +102,7 @@ namespace KeyManagement.Api.Services
             await _context.SaveChangesAsync();
             return await _context.UserRoles
                 .Include(ur => ur.Role)
-                .Where(ur => ur.User.Id == userId)
+                .Where(ur => ur.User.Id == user.Id)
                 .ToListAsync();
         }
     }

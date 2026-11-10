@@ -30,11 +30,11 @@ describe('AdminAddRoleComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render a user ID input and four role checkboxes', () => {
+  it('should render an email input and four role checkboxes', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('input[name="userId"]')).toBeTruthy();
+    expect(element.querySelector('input[name="email"][type="email"]')).toBeTruthy();
     expect(element.querySelectorAll('input[type="checkbox"]')).toHaveLength(4);
     expect(element.textContent).toContain('Oktató');
     expect(element.textContent).toContain('Portás');
@@ -46,9 +46,9 @@ describe('AdminAddRoleComponent', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    const userIdInput = element.querySelector('input[name="userId"]') as HTMLInputElement;
-    userIdInput.value = '42';
-    userIdInput.dispatchEvent(new Event('input'));
+    const emailInput = element.querySelector('input[name="email"]') as HTMLInputElement;
+    emailInput.value = 'user@example.com';
+    emailInput.dispatchEvent(new Event('input'));
 
     const adminCheckbox = element.querySelector('#role-admin') as HTMLInputElement;
     adminCheckbox.checked = true;
@@ -56,7 +56,7 @@ describe('AdminAddRoleComponent', () => {
     await fixture.whenStable();
 
     expect(component.formData).toEqual({
-      userId: 42,
+      email: 'user@example.com',
       roles: {
         oktato: false,
         portas: false,
@@ -66,17 +66,17 @@ describe('AdminAddRoleComponent', () => {
     });
   });
 
-  it('should require a valid user ID before assigning roles', () => {
+  it('should require a valid email before assigning roles', () => {
     component.formData.roles.admin = true;
     component.requestData();
 
-    expect(component.statusMessage()).toBe('Adj meg egy érvényes felhasználói azonosítót.');
+    expect(component.statusMessage()).toBe('Adj meg egy érvényes e-mail-címet.');
     expect(component.statusIsError()).toBe(true);
     httpTestingController.expectNone('/api/UserRole/assign');
   });
 
   it('should require at least one role before assigning roles', () => {
-    component.formData.userId = 42;
+    component.formData.email = 'user@example.com';
     component.requestData();
 
     expect(component.statusMessage()).toBe('Jelölj ki legalább egy szerepkört.');
@@ -84,14 +84,14 @@ describe('AdminAddRoleComponent', () => {
     httpTestingController.expectNone('/api/UserRole/assign');
   });
 
-  it('should send the selected user and role IDs and show success', () => {
-    component.formData.userId = 42;
+  it('should send the selected email and role IDs and show success', () => {
+    component.formData.email = 'user@example.com';
     component.formData.roles.admin = true;
     component.requestData();
 
     const request = httpTestingController.expectOne('/api/UserRole/assign');
     expect(request.request.method).toBe('POST');
-    expect(request.request.body).toEqual({ userId: 42, roleIds: [3] });
+    expect(request.request.body).toEqual({ email: 'user@example.com', roleIds: [3] });
     expect(component.isSubmitting()).toBe(true);
     request.flush([]);
 
@@ -105,7 +105,7 @@ describe('AdminAddRoleComponent', () => {
   });
 
   it('should show an error when the role assignment request fails', () => {
-    component.formData.userId = 42;
+    component.formData.email = 'user@example.com';
     component.formData.roles.admin = true;
     component.requestData();
 

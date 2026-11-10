@@ -81,8 +81,17 @@ public class RoomController : ControllerBase
         var result = await _service.CreateRoomAsync(dto, adminId);
 
         if (!result.Success)
-            return BadRequest(new { message = result.Error });
+        {
+            var error = result.Error;
+            if (error == "Building not found.")
+                return NotFound(new { message = error });
 
-        return Ok(new { message = "Room created successfully." });
+            if (error is "A room with this name already exists." or "A building with this name already exists.")
+                return Conflict(new { message = error });
+
+            return BadRequest(new { message = error });
+        }
+
+        return StatusCode(StatusCodes.Status201Created, new { message = "Room created successfully." });
     }
 }

@@ -34,7 +34,7 @@ describe('AdminCreateRoomComponent', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('input[name="buildingId"]')).toBeTruthy();
+    expect(element.querySelector('input[name="buildingName"][type="text"]')).toBeTruthy();
     expect(element.querySelector('input[name="roomName"]')).toBeTruthy();
     expect(element.querySelector('input[name="capacity"]')).toBeTruthy();
     expect(element.querySelector('input[name="equipment"]')).toBeTruthy();
@@ -52,7 +52,7 @@ describe('AdminCreateRoomComponent', () => {
     component.requestData();
 
     expect(component.statusMessage()).toBe(
-      'Adj meg érvényes épületazonosítót, teremnevet és befogadóképességet.',
+      'Adj meg érvényes épületnevet, teremnevet és befogadóképességet.',
     );
     expect(component.statusIsError()).toBe(true);
     httpTestingController.expectNone('/api/Room');
@@ -62,9 +62,9 @@ describe('AdminCreateRoomComponent', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    const buildingId = element.querySelector('input[name="buildingId"]') as HTMLInputElement;
-    buildingId.value = '2';
-    buildingId.dispatchEvent(new Event('input'));
+    const buildingName = element.querySelector('input[name="buildingName"]') as HTMLInputElement;
+    buildingName.value = '  Building 2  ';
+    buildingName.dispatchEvent(new Event('input'));
 
     const roomName = element.querySelector('input[name="roomName"]') as HTMLInputElement;
     roomName.value = '301-es terem';
@@ -81,7 +81,7 @@ describe('AdminCreateRoomComponent', () => {
     expect(submitButton.disabled).toBe(false);
 
     expect(component.formData).toMatchObject({
-      buildingId: 2,
+      buildingName: '  Building 2  ',
       roomName: '301-es terem',
       capacity: 24,
     });
@@ -91,7 +91,7 @@ describe('AdminCreateRoomComponent', () => {
     const request = httpTestingController.expectOne('/api/Room');
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({
-      buildingId: 2,
+      buildingName: 'Building 2',
       name: '301-es terem',
       capacity: 24,
       equipments: [],
@@ -108,7 +108,7 @@ describe('AdminCreateRoomComponent', () => {
 
   it('should include the parsed equipment list and show backend errors', () => {
     component.formData = {
-      buildingId: 2,
+      buildingName: 'Building 2',
       roomName: '301-es terem',
       capacity: 24,
       equipment: [],

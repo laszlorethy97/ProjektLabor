@@ -1,5 +1,5 @@
 export interface CreateRoomDto {
-  buildingId: number;
+  buildingName: string;
   name: string;
   capacity: number;
   equipments: string[];

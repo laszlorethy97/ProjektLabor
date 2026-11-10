@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { RoomDto } from '../../dtos/room-dto';
 import { TutorService } from '../../services/tutor-service';
 
@@ -25,19 +26,16 @@ export class AdminRoomlistComponent implements OnInit {
     this.isLoading.set(true);
     this.loadError.set(false);
 
-    this.tutorService.loadRooms().subscribe({
-      next: (rooms) => {
-        this.rooms.set(rooms);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.loadError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+    this.tutorService.loadRooms()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (rooms) => this.rooms.set(rooms),
+        error: () => this.loadError.set(true),
+      });
   }
 
   selectRoom(room: RoomDto): void {
     void this.router.navigate(['/admin/maintenance', room.roomId]);
   }
+
 }

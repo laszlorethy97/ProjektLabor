@@ -37,12 +37,14 @@ namespace KeyManagement.Api.Controllers
 
             if (!result.Success)
             {
-                var errorResponse = new { message = result.Error };
-                return result.Error switch
-                {
-                    "Room not found." or "User not found." => NotFound(errorResponse),
-                    _ => BadRequest(errorResponse)
-                };
+                var error = result.Error;
+                if (error == "Room not found.")
+                    return NotFound(new { message = error });
+
+                if (error == "Multiple rooms found with this name.")
+                    return Conflict(new { message = error });
+
+                return BadRequest(new { message = error });
             }
 
             return StatusCode(StatusCodes.Status201Created, new

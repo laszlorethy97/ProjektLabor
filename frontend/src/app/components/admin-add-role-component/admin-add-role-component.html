@@ -24,13 +24,13 @@
           <div>
             <h2 id="user-section-title" class="role-assignment__section-title">Felhasználó</h2>
             <p class="role-assignment__section-description">
-              Add meg annak a felhasználónak az azonosítóját, akinek a szerepköröket adod.
+              Add meg annak a felhasználónak az e-mail-címét, akinek a szerepköröket adod.
             </p>
           </div>
         </div>
 
         <div class="role-assignment__field">
-          <label class="role-assignment__label" for="user-id">Felhasználói azonosító</label>
+          <label class="role-assignment__label" for="user-email">E-mail-cím</label>
           <div class="role-assignment__input-wrap">
             <svg class="role-assignment__input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="8" r="3.25"></circle>
@@ -38,26 +38,18 @@
             </svg>
             <input
               class="role-assignment__input"
-              id="user-id"
-              name="userId"
-              type="number"
-              min="1"
-              step="1"
+              id="user-email"
+              name="email"
+              type="email"
               required
-              list="user-id-options"
-              placeholder="Például: 1"
-              autocomplete="off"
-              aria-describedby="user-id-hint"
-              [(ngModel)]="formData.userId"
+              placeholder="pelda@domain.hu"
+              autocomplete="email"
+              aria-describedby="user-email-hint"
+              [(ngModel)]="formData.email"
             />
-            <datalist id="user-id-options">
-              @for (userId of availableUserIds; track userId) {
-                <option [value]="userId">Felhasználó {{ userId }}</option>
-              }
-            </datalist>
           </div>
-          <span class="role-assignment__hint" id="user-id-hint">
-            Válassz a listából, vagy írj be egy legalább 1-es egész számot.
+          <span class="role-assignment__hint" id="user-email-hint">
+            A szerepköröket az e-mail-cím alapján keressük meg.
           </span>
         </div>
       </section>

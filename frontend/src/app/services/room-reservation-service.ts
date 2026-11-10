@@ -16,7 +16,7 @@ export class RoomReservationService {
   }
 
   loadRoomSchedule(roomId: number): Observable<RoomScheduleDto> {
-    return this.httpClient.get<RoomScheduleDto>(`/api/Room/schedule/${roomId}`);
+    return this.httpClient.post<RoomScheduleDto>('/api/Room/schedule', { roomId });
   }
 
   createReservation(reservation: RoomReservationDto): Observable<void> {

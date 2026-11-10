@@ -21,7 +21,7 @@ describe('PermissionService', () => {
   });
 
   it('creates a permission for the selected user and master key', () => {
-    const dto = { userId: 12, masterKeyId: 3 };
+    const dto = { email: 'user@example.com', masterKeyId: 3 };
 
     service.createPermission(dto).subscribe();
 

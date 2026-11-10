@@ -1,9 +1,9 @@
-export interface RoomScheduleDto {
-  reservations: RoomTimeIntervalDto[];
-  maintenances: RoomTimeIntervalDto[];
-}
-
-export interface RoomTimeIntervalDto {
+export interface TimeIntervalDto {
   startTime: string;
   endTime: string;
+}
+
+export interface RoomScheduleDto {
+  reservations: TimeIntervalDto[];
+  maintenances: TimeIntervalDto[];
 }

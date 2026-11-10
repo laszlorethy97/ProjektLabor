@@ -4,8 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { finalize, map } from 'rxjs';
 import { RoomEquipmentDto } from '../../dtos/room-equipment.dto';
 import { RoomReservationDto } from '../../dtos/room-reservation.dto';
-import { RoomScheduleDto, RoomTimeIntervalDto } from '../../dtos/room-schedule.dto';
+import { RoomScheduleDto, TimeIntervalDto } from '../../dtos/room-schedule.dto';
 import { RoomReservationService } from '../../services/room-reservation-service';
+import { getAdminRequestErrorMessage } from '../../services/admin-request-error';
 
 const FIRST_HOUR = 6;
 const LAST_HOUR = 22;
@@ -37,15 +38,21 @@ export class RoomReservationComponent implements OnInit {
   readonly hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i);
 
   readonly equipments = signal<RoomEquipmentDto[]>([]);
-  readonly roomSchedule = signal<RoomScheduleDto | null>(null);
-  readonly isScheduleLoading = signal(false);
+  readonly schedule = signal<RoomScheduleDto>({ reservations: [], maintenances: [] });
+  readonly reservations = computed(() => this.sortIntervals(this.schedule().reservations));
+  readonly maintenances = computed(() => this.sortIntervals(this.schedule().maintenances));
+  readonly reservationsForSelectedDate = computed(() =>
+    this.intervalsForSelectedDate(this.reservations()),
+  );
+  readonly maintenancesForSelectedDate = computed(() =>
+    this.intervalsForSelectedDate(this.maintenances()),
+  );
+  readonly isLoadingSchedule = signal(false);
   readonly scheduleError = signal('');
   readonly selectedDate = signal<Date | null>(null);
   readonly selectedHour = signal<number | null>(null);
   readonly selectedEquipmentIds = signal<number[]>([]);
   readonly isSubmitting = signal(false);
-  readonly statusMessage = signal('');
-  readonly statusIsError = signal(false);
 
   private readonly today = startOfDay(new Date());
   readonly viewMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
@@ -90,7 +97,7 @@ export class RoomReservationComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEquipments();
-    this.loadRoomSchedule();
+    this.loadSchedule();
   }
 
   loadEquipments(): void {
@@ -105,29 +112,23 @@ export class RoomReservationComponent implements OnInit {
     });
   }
 
-  loadRoomSchedule(): void {
+  loadSchedule(): void {
     const roomId = this.roomId();
-    if (roomId === null || roomId < 1) {
-      this.scheduleError.set('Érvénytelen teremazonosító.');
+    if (roomId === null) {
       return;
     }
 
-    this.isScheduleLoading.set(true);
+    this.isLoadingSchedule.set(true);
     this.scheduleError.set('');
-    this.roomReservationService.loadRoomSchedule(roomId).subscribe({
-      next: (schedule) => {
-        this.roomSchedule.set(schedule);
-        this.isScheduleLoading.set(false);
-        const selectedHour = this.selectedHour();
-        if (selectedHour !== null && this.isHourUnavailable(selectedHour)) {
-          this.selectedHour.set(null);
-        }
-      },
-      error: () => {
-        this.scheduleError.set('Nem sikerült betölteni a terem foglaltságát. Frissítsd az adatokat a foglalás előtt.');
-        this.isScheduleLoading.set(false);
-      },
-    });
+    this.roomReservationService
+      .loadRoomSchedule(roomId)
+      .pipe(finalize(() => this.isLoadingSchedule.set(false)))
+      .subscribe({
+        next: (schedule) => this.schedule.set(schedule),
+        error: (error: unknown) => this.scheduleError.set(
+          getAdminRequestErrorMessage(error, 'Nem sikerült betölteni a terem időbeosztását.'),
+        ),
+      });
   }
 
   prevMonth(): void {
@@ -141,29 +142,13 @@ export class RoomReservationComponent implements OnInit {
   }
 
   selectDate(day: CalendarDay): void {
-    if (day.disabled || this.isDateUnavailable(day)) {
+    if (day.disabled) {
       return;
     }
     this.selectedDate.set(day.date);
-    const selectedHour = this.selectedHour();
-    if (selectedHour !== null && this.isHourUnavailable(selectedHour)) {
-      this.selectedHour.set(null);
-    }
     if (!day.inMonth) {
       this.viewMonth.set(new Date(day.date.getFullYear(), day.date.getMonth(), 1));
     }
-  }
-
-  isDateUnavailable(day: CalendarDay): boolean {
-    return this.isScheduleLoading() ||
-      !!this.scheduleError() ||
-      !this.roomSchedule() ||
-      this.hours.every((hour) => this.isHourUnavailableForDate(day.date, hour));
-  }
-
-  isHourUnavailable(hour: number): boolean {
-    const date = this.selectedDate();
-    return date === null || this.isHourUnavailableForDate(date, hour);
   }
 
   isSelected(day: CalendarDay): boolean {
@@ -177,21 +162,7 @@ export class RoomReservationComponent implements OnInit {
 
   onHourChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
-    const hour = value === '' ? null : Number(value);
-    this.selectedHour.set(hour !== null && !this.isHourUnavailable(hour) ? hour : null);
-  }
-
-  formatInterval(interval: RoomTimeIntervalDto): string {
-    const format = (value: string) =>
-      new Date(value).toLocaleString('hu-HU', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-
-    return `${format(interval.startTime)} – ${format(interval.endTime)}`;
+    this.selectedHour.set(value === '' ? null : Number(value));
   }
 
   isEquipmentSelected(id: number): boolean {
@@ -214,55 +185,53 @@ export class RoomReservationComponent implements OnInit {
       return;
     }
 
-    if (this.isHourUnavailable(reservation.startDate.getHours())) {
-      this.selectedHour.set(null);
-      this.statusMessage.set('Ez az időpont már foglalt vagy nem elérhető. Válassz másik időpontot.');
-      this.statusIsError.set(true);
-      return;
-    }
-
     this.isSubmitting.set(true);
-    this.statusMessage.set('');
     this.roomReservationService
       .createReservation(reservation)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {
-          this.statusMessage.set('Sikeres foglalás! A terem foglaltsága frissült.');
-          this.statusIsError.set(false);
-          this.loadRoomSchedule();
+          alert('Sikeres foglalás!');
+          this.loadSchedule();
         },
-        error: () => {
-          this.statusMessage.set('Nem sikerült a foglalás. Frissítsd a foglaltságot, majd próbálkozz újra.');
-          this.statusIsError.set(true);
-          this.loadRoomSchedule();
-        },
+        error: () => alert('Nem sikerült a foglalás'),
       });
   }
 
-  private isHourUnavailableForDate(date: Date, hour: number): boolean {
-    const schedule = this.roomSchedule();
-    if (!schedule || this.isScheduleLoading() || this.scheduleError()) {
-      return true;
+  formatDateTime(value: string): string {
+    return new Date(value).toLocaleString('hu-HU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  formatTimeRange(interval: TimeIntervalDto): string {
+    const formatTime = (value: string) =>
+      new Date(value).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+    return `${formatTime(interval.startTime)} – ${formatTime(interval.endTime)}`;
+  }
+
+  private intervalsForSelectedDate(intervals: TimeIntervalDto[]): TimeIntervalDto[] {
+    const date = this.selectedDate();
+    if (!date) {
+      return [];
     }
 
-    const start = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      hour,
-      0,
-      0,
-      0,
-    ).getTime();
-    const end = start + 45 * 60 * 1000;
-    if (start <= Date.now()) {
-      return true;
-    }
+    const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime();
+    return intervals.filter((interval) => {
+      const start = new Date(interval.startTime).getTime();
+      const end = new Date(interval.endTime).getTime();
+      return start < dayEnd && end > dayStart;
+    });
+  }
 
-    return [...schedule.reservations, ...schedule.maintenances].some((interval) =>
-      new Date(interval.startTime).getTime() < end &&
-      new Date(interval.endTime).getTime() > start,
+  private sortIntervals(intervals: TimeIntervalDto[]): TimeIntervalDto[] {
+    return [...intervals].sort(
+      (left, right) => new Date(left.startTime).getTime() - new Date(right.startTime).getTime(),
     );
   }
 
