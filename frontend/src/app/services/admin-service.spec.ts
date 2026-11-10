@@ -149,7 +149,7 @@ describe('AdminService', () => {
   });
 
   it('creates equipment for a room', () => {
-    const dto = { roomId: 7, name: 'projektor' };
+    const dto = { roomName: '204-es terem', equipmentNames: ['projektor'] };
 
     service.createEquipment(dto).subscribe();
 
