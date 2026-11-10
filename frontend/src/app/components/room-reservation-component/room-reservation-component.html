@@ -54,36 +54,38 @@
           <option [value]="hour" [selected]="selectedHour() === hour">{{ formatHour(hour) }}</option>
         }
       </select>
-      @if (selectedDate()) {
-        <div class="reservation__schedule" aria-label="A kiválasztott nap foglalásai és karbantartásai">
-          @if (isLoadingSchedule()) {
-            <p class="reservation__empty" role="status">Időbeosztás betöltése...</p>
-          } @else if (scheduleError()) {
-            <p class="reservation__schedule-error" role="alert">{{ scheduleError() }}</p>
-          } @else {
-            <div class="reservation__schedule-group">
-              <h3 class="reservation__schedule-heading">Foglalások</h3>
-              <ul class="reservation__intervals">
-                @for (reservation of reservationsForSelectedDate(); track reservation.startTime + reservation.endTime) {
-                  <li>{{ formatTimeRange(reservation) }}</li>
-                } @empty {
-                  <li class="reservation__empty">Nincs foglalás ezen a napon.</li>
-                }
-              </ul>
-            </div>
-            <div class="reservation__schedule-group">
-              <h3 class="reservation__schedule-heading">Karbantartások</h3>
-              <ul class="reservation__intervals">
-                @for (maintenance of maintenancesForSelectedDate(); track maintenance.startTime + maintenance.endTime) {
-                  <li>{{ formatTimeRange(maintenance) }}</li>
-                } @empty {
-                  <li class="reservation__empty">Nincs karbantartás ezen a napon.</li>
-                }
-              </ul>
-            </div>
-          }
-        </div>
-      }
+    </section>
+
+    <section class="reservation__section">
+      <h2 class="reservation__label">A terem időbeosztása</h2>
+      <div class="reservation__schedule" aria-label="A terem foglalásai és karbantartásai">
+        @if (isLoadingSchedule()) {
+          <p class="reservation__empty" role="status">Időbeosztás betöltése...</p>
+        } @else if (scheduleError()) {
+          <p class="reservation__schedule-error" role="alert">{{ scheduleError() }}</p>
+        } @else {
+          <div class="reservation__schedule-group">
+            <h3 class="reservation__schedule-heading">Foglalások</h3>
+            <ul class="reservation__intervals">
+              @for (reservation of reservations(); track reservation.startTime + reservation.endTime) {
+                <li>{{ formatDateTime(reservation.startTime) }} – {{ formatDateTime(reservation.endTime) }}</li>
+              } @empty {
+                <li class="reservation__empty">Nincs foglalás.</li>
+              }
+            </ul>
+          </div>
+          <div class="reservation__schedule-group reservation__schedule-group--maintenance">
+            <h3 class="reservation__schedule-heading">Karbantartások</h3>
+            <ul class="reservation__intervals">
+              @for (maintenance of maintenances(); track maintenance.startTime + maintenance.endTime) {
+                <li>{{ formatDateTime(maintenance.startTime) }} – {{ formatDateTime(maintenance.endTime) }}</li>
+              } @empty {
+                <li class="reservation__empty">Nincs karbantartás.</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
     </section>
 
     <section class="reservation__section">
