@@ -53,29 +53,35 @@ describe('RoomReservationComponent', () => {
     expect(items.length).toBe(2);
   });
 
-  it('should show only the selected date schedule next to the time selector', () => {
+  it('should show the room reservation and maintenance times as soon as the room is selected', () => {
     httpTesting.expectOne('/api/Equipment/by-room-id/7').flush([]);
     component.loadSchedule();
-    httpTesting.expectOne('/api/Room/schedule').flush({
-      reservations: [
-        { startTime: '2030-01-15T10:00:00', endTime: '2030-01-15T10:45:00' },
-        { startTime: '2030-01-16T10:00:00', endTime: '2030-01-16T10:45:00' },
-      ],
-      maintenances: [
-        { startTime: '2030-01-15T08:00:00', endTime: '2030-01-15T12:00:00' },
-      ],
-    });
-    component.selectDate({ date: new Date(2030, 0, 15), inMonth: true, disabled: false });
+    const reservations = [
+      { startTime: '2030-01-15T10:00:00', endTime: '2030-01-15T10:45:00' },
+      { startTime: '2030-01-16T10:00:00', endTime: '2030-01-16T10:45:00' },
+    ];
+    const maintenances = [
+      { startTime: '2030-01-15T08:00:00', endTime: '2030-01-15T12:00:00' },
+    ];
+    httpTesting.expectOne('/api/Room/schedule').flush({ reservations, maintenances });
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
     const pageText = element.textContent ?? '';
+    expect(pageText).toContain('A terem időbeosztása');
     expect(pageText).toContain('Foglalások');
-    expect(pageText).toContain('10:00 – 10:45');
+    expect(pageText).toContain(
+      `${component.formatDateTime(reservations[0].startTime)} – ${component.formatDateTime(reservations[0].endTime)}`,
+    );
+    expect(pageText).toContain(
+      `${component.formatDateTime(reservations[1].startTime)} – ${component.formatDateTime(reservations[1].endTime)}`,
+    );
     expect(pageText).toContain('Karbantartások');
-    expect(pageText).toContain('08:00 – 12:00');
-    expect(pageText).not.toContain('2030. 01. 16.');
+    expect(pageText).toContain(
+      `${component.formatDateTime(maintenances[0].startTime)} – ${component.formatDateTime(maintenances[0].endTime)}`,
+    );
     expect(element.querySelector('.reservation__schedule')).toBeTruthy();
+    expect(component.selectedDate()).toBeNull();
   });
 
   it('should send the selected day, hour and equipments on submit', () => {
