@@ -6,6 +6,10 @@ using KeyManagement.Api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using KeyManagement.Api.DTO;
+using KeyManagement.Api.Controllers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KeyManagement.Api.ServiceTests
 {
@@ -117,6 +121,76 @@ namespace KeyManagement.Api.ServiceTests
             var dto = new LoginUserDTO { Email = "invalid@example.com", Password = "password123" };
             var token = await service.LoginUser(dto);
             Assert.Null(token);
+        }
+
+        [Fact]
+        public async Task RegisterUserAsync_DuplicateEmailIgnoringCase_ReturnsConflictError()
+        {
+            using var context = _GetDbContext();
+            context.Users.AddRange(
+                new User { Id = 1, Email = "admin@example.com" },
+                new User { Id = 2, Email = "existing@example.com" });
+            await context.SaveChangesAsync();
+
+            var controller = new UserController(new UserService(context))
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(new ClaimsIdentity(
+                        [
+                            new Claim(ClaimTypes.NameIdentifier, "1")
+                        ], "test"))
+                    }
+                }
+            };
+
+            var result = await controller.Register(new RegisterUserDTO
+            {
+                Email = " EXISTING@example.com ",
+                PinCode = "123456",
+                Password = "secure-password",
+                Roles = ["oktato"]
+            });
+
+            var conflict = Assert.IsType<ConflictObjectResult>(result);
+            Assert.Equal(StatusCodes.Status409Conflict, conflict.StatusCode);
+        }
+
+        [Fact]
+        public async Task RegisterUserAsync_ValidRequest_ReturnsCreated()
+        {
+            using var context = _GetDbContext();
+            context.Users.Add(new User { Id = 1, Email = "admin@example.com" });
+            context.Roles.Add(new Role { Id = 1, Type = "oktato" });
+            await context.SaveChangesAsync();
+
+            var controller = new UserController(new UserService(context))
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(new ClaimsIdentity(
+                        [
+                            new Claim(ClaimTypes.NameIdentifier, "1")
+                        ], "test"))
+                    }
+                }
+            };
+
+            var result = await controller.Register(new RegisterUserDTO
+            {
+                Email = " New.User@example.com ",
+                PinCode = "123456",
+                Password = "secure-password",
+                Roles = ["oktato"]
+            });
+
+            var created = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(StatusCodes.Status201Created, created.StatusCode);
+            Assert.Contains(context.Users, user => user.Email == "New.User@example.com");
         }
 
     }

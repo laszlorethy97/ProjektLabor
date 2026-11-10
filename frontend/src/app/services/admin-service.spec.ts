@@ -122,4 +122,40 @@ describe('AdminService', () => {
     expect(request.request.body).toEqual(dto);
     request.flush({ message: 'Maintenance created successfully.' });
   });
+
+  it('creates a master key without request data', () => {
+    service.createMasterKey().subscribe();
+
+    const request = httpTestingController.expectOne('/api/MasterKey/create');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({});
+    request.flush({ id: 8 }, { status: 201, statusText: 'Created' });
+  });
+
+  it('registers a user with the selected account data and roles', () => {
+    const dto = {
+      email: 'new.user@example.com',
+      pinCode: '123456',
+      password: 'secure-password',
+      roles: ['oktato', 'admin'],
+    };
+
+    service.registerUser(dto).subscribe();
+
+    const request = httpTestingController.expectOne('/api/User/register');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(dto);
+    request.flush({ message: 'User registered successfully.' }, { status: 201, statusText: 'Created' });
+  });
+
+  it('creates equipment for a room', () => {
+    const dto = { roomId: 7, name: 'projektor' };
+
+    service.createEquipment(dto).subscribe();
+
+    const request = httpTestingController.expectOne('/api/Equipment');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(dto);
+    request.flush({ message: 'Equipment created successfully.' }, { status: 201, statusText: 'Created' });
+  });
 });

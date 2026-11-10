@@ -159,6 +159,11 @@
     box-shadow: 0 4px 12px #456ba933;
   }
 
+  &:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+
   &:focus-visible {
     outline: 3px solid #5278bd59;
     outline-offset: 3px;

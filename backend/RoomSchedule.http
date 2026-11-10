@@ -1,0 +1,10 @@
+@baseUrl = http://localhost:8081
+@accessToken = replace-with-a-valid-jwt
+
+### Get scheduled reservations and maintenance intervals for room 7
+GET {{baseUrl}}/api/Room/schedule/7
+Authorization: Bearer {{accessToken}}
+
+### Room not found
+GET {{baseUrl}}/api/Room/schedule/999999
+Authorization: Bearer {{accessToken}}
