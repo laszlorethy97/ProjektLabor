@@ -19,6 +19,9 @@ public static class ServiceCollectionExtensions
             services.AddScoped(serviceType);
         }
 
+        services.AddScoped<IAuditLogService>(provider =>
+            provider.GetRequiredService<AuditLogService>());
+
         return services;
     }
 }

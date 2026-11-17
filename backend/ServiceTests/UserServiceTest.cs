@@ -10,6 +10,7 @@ using KeyManagement.Api.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 
 namespace KeyManagement.Api.ServiceTests
 {
@@ -32,7 +33,7 @@ namespace KeyManagement.Api.ServiceTests
             context.Users.Add(new User { Id = 2, Email = "jane.doe@example.com", PasswordHash = "password456" });
             await context.SaveChangesAsync();
             
-            var service = new UserService(context);
+            var service = CreateUserService(context);
             var result = await service.GetAllAsync();
 
             Assert.NotNull(result);
@@ -45,7 +46,7 @@ namespace KeyManagement.Api.ServiceTests
         public async Task LoginUser_IfUserIsValid_ReturnsToken()
         {
             using var context = _GetDbContext();
-            var service = new UserService(context);
+            var service = CreateUserService(context);
 
             var user1 = new User
             {
@@ -68,13 +69,20 @@ namespace KeyManagement.Api.ServiceTests
             var token = await service.LoginUser(dto);
             Assert.NotNull(token);
             Assert.NotEmpty(token);
+
+            var auditEvent = await context.AuditLogs.SingleAsync(entry =>
+                entry.EventType == AuditLogEventTypes.Authentication);
+            Assert.Equal(1, auditEvent.ActorUserId);
+            Assert.Equal("john.doe@example.com", auditEvent.ActorEmail);
+            Assert.Equal("admin", auditEvent.ActorRoles);
+            Assert.Contains("\"outcome\":\"success\"", auditEvent.Details);
         }
 
        [Fact]
         public async Task LoginUser_IfPasswordIsInvalid_ReturnsNull()
         {
             using var context = _GetDbContext();
-            var service = new UserService(context);
+            var service = CreateUserService(context);
 
             var hasher = new PasswordHasher<User>();
             var dummyUser = new User();
@@ -93,13 +101,19 @@ namespace KeyManagement.Api.ServiceTests
             var dto = new LoginUserDTO { Email = "john.doe@example.com", Password = "wrongpassword" };
             var token = await service.LoginUser(dto);
             Assert.Null(token);
+
+            var auditEvent = await context.AuditLogs.SingleAsync(entry =>
+                entry.EventType == AuditLogEventTypes.Authentication);
+            Assert.Null(auditEvent.ActorUserId);
+            Assert.Contains("john.doe@example.com", auditEvent.Details);
+            Assert.DoesNotContain("wrongpassword", auditEvent.Details);
         }
 
         [Fact]
         public async Task LoginUser_IfEmailIsInvalid_ReturnsNull()
         {
             using var context = _GetDbContext();
-            var service = new UserService(context);
+            var service = CreateUserService(context);
 
            var user1 = new User
             {
@@ -132,7 +146,7 @@ namespace KeyManagement.Api.ServiceTests
                 new User { Id = 2, Email = "existing@example.com" });
             await context.SaveChangesAsync();
 
-            var controller = new UserController(new UserService(context))
+            var controller = new UserController(CreateUserService(context))
             {
                 ControllerContext = new ControllerContext
                 {
@@ -166,7 +180,7 @@ namespace KeyManagement.Api.ServiceTests
             context.Roles.Add(new Role { Id = 1, Type = "oktato" });
             await context.SaveChangesAsync();
 
-            var controller = new UserController(new UserService(context))
+            var controller = new UserController(CreateUserService(context))
             {
                 ControllerContext = new ControllerContext
                 {
@@ -191,6 +205,18 @@ namespace KeyManagement.Api.ServiceTests
             var created = Assert.IsType<ObjectResult>(result);
             Assert.Equal(StatusCodes.Status201Created, created.StatusCode);
             Assert.Contains(context.Users, user => user.Email == "New.User@example.com");
+        }
+
+        private static UserService CreateUserService(KeyManagementDbContext context)
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Jwt:Key"] = "unit-test-signing-key-with-at-least-32-bytes"
+                })
+                .Build();
+
+            return new UserService(context, configuration);
         }
 
     }

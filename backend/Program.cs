@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using KeyManagement.Api.Data;
 using KeyManagement.Api.Services;
+using KeyManagement.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 var key = Encoding.UTF8.GetBytes(
@@ -16,6 +17,7 @@ var key = Encoding.UTF8.GetBytes(
 builder.Services.AddControllers();
 
 builder.Services.AddServices();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddOpenApi(options =>
 {
@@ -88,6 +90,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<AuditLogMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

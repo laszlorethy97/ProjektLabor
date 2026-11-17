@@ -37,6 +37,7 @@ namespace KeyManagement.Api.Services
                 Key = key,
                 PinCode = keyTransactionDTO.PinCode,
                 StartedAt = DateTime.UtcNow,
+                DueAt = reservation.EndTime,
                 StartedByUser = startedByUser,
                 User = user
             };

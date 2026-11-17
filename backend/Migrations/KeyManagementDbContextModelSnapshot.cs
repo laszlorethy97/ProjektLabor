@@ -37,6 +37,83 @@ namespace KeyManagement.Api.Migrations
                     b.ToTable("EquipmentReservation");
                 });
 
+            modelBuilder.Entity("KeyManagement.Api.Models.Entities.AuditLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ActorEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ActorRoles")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int?>("ActorUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DurationMilliseconds")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityId")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("EntityName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Resource")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccurredAt");
+
+                    b.HasIndex("ActorUserId", "OccurredAt");
+
+                    b.HasIndex("EventType", "OccurredAt");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("KeyManagement.Api.Models.Entities.Building", b =>
                 {
                     b.Property<int>("Id")
@@ -128,6 +205,9 @@ namespace KeyManagement.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("EndedAt")
                         .HasColumnType("datetime2");
 
@@ -160,6 +240,8 @@ namespace KeyManagement.Api.Migrations
                     b.HasIndex("StartedByUserId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("EndedAt", "DueAt");
 
                     b.ToTable("KeyTransactions");
                 });

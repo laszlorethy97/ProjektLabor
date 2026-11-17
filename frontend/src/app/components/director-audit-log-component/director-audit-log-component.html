@@ -1,0 +1,293 @@
+<main class="audit-page">
+  <header class="audit-page__header">
+    <div>
+      <p class="audit-page__eyebrow">Biztonsági felügyelet</p>
+      <h1>Auditnapló és forgalmi kimutatás</h1>
+      <p class="audit-page__description">
+        Rendszerműveletek, kulcsforgalom és határidőn túli kulcsleadások áttekintése.
+      </p>
+    </div>
+    <button class="audit-button" type="button" (click)="refresh()" [disabled]="isLoading()">
+      Frissítés
+    </button>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="audit-message audit-message--error" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <p class="audit-message" role="status">Adatok betöltése…</p>
+  } @else {
+    <section class="audit-section audit-section--alert" aria-labelledby="overdue-title">
+      <div class="audit-section__heading">
+        <div>
+          <p class="audit-page__eyebrow">Automatikus figyelmeztetés</p>
+          <h2 id="overdue-title">Lejárt kulcsleadások</h2>
+        </div>
+        <span class="audit-count" [class.audit-count--alert]="overdueKeys().length > 0">
+          {{ overdueKeys().length }}
+        </span>
+      </div>
+
+      @if (overdueKeys().length) {
+        <div class="audit-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Kulcs</th>
+                <th>Helyiség</th>
+                <th>Használó</th>
+                <th>Leadási határidő</th>
+                <th>Kivétel ideje</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (key of overdueKeys(); track key.transactionId) {
+                <tr>
+                  <td>{{ key.keyCode }}</td>
+                  <td>{{ key.roomName }}</td>
+                  <td>{{ key.borrowerEmail }} <span class="audit-muted">(#{{ key.borrowerUserId }})</span></td>
+                  <td>{{ key.dueAt | date: 'yyyy. MM. dd. HH:mm' }}</td>
+                  <td>{{ key.checkedOutAt | date: 'yyyy. MM. dd. HH:mm' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="audit-empty">Nincs határidőn túli, vissza nem adott kulcs.</p>
+      }
+    </section>
+
+    <section class="audit-section" aria-labelledby="traffic-title">
+      <div class="audit-section__heading">
+        <div>
+          <p class="audit-page__eyebrow">Kulcsforgalom</p>
+          <h2 id="traffic-title">Forgalmi kimutatás</h2>
+        </div>
+        <div class="audit-filters">
+          <label>
+            Időszak
+            <select [value]="period()" (change)="onPeriodSelect($event)">
+              <option value="daily">Napi</option>
+              <option value="weekly">Heti</option>
+            </select>
+          </label>
+          <label>
+            Ettől
+            <input type="date" [value]="from()" (change)="onFromChange($event)" />
+          </label>
+          <label>
+            Eddig
+            <input type="date" [value]="to()" (change)="onToChange($event)" />
+          </label>
+        </div>
+      </div>
+
+      @if (traffic(); as report) {
+        <div class="audit-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ report.period === 'daily' ? 'Nap' : 'Hét kezdete' }}</th>
+                <th>Kulcsátvételek</th>
+                <th>Kulcsleadások</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of report.entries; track entry.periodStart) {
+                <tr>
+                  <td>{{ entry.periodStart | date: 'yyyy. MM. dd.' }}</td>
+                  <td>{{ entry.checkouts }}</td>
+                  <td>{{ entry.returns }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="3" class="audit-empty">A kiválasztott időszakban nincs forgalom.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="audit-section" aria-labelledby="room-utilization-title">
+      <div class="audit-section__heading">
+        <div>
+          <p class="audit-page__eyebrow">Teremhasználat</p>
+          <h2 id="room-utilization-title">Teremkihasználtsági kimutatás</h2>
+          <p class="audit-page__description">
+            Foglalások száma és foglalással lekötött órák helyiségenként.
+          </p>
+        </div>
+      </div>
+
+      @if (roomUtilization(); as report) {
+        <div class="audit-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ report.period === 'daily' ? 'Nap' : 'Hét kezdete' }}</th>
+                <th>Épület</th>
+                <th>Terem</th>
+                <th>Foglalások</th>
+                <th>Lekötött órák</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of report.entries; track entry.roomId + '-' + entry.periodStart) {
+                <tr>
+                  <td>{{ entry.periodStart | date: 'yyyy. MM. dd.' }}</td>
+                  <td>{{ entry.buildingName }}</td>
+                  <td>{{ entry.roomName }}</td>
+                  <td>{{ entry.reservationCount }}</td>
+                  <td>{{ entry.reservedHours }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="audit-empty">Nincs megjeleníthető teremadat.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="audit-section" aria-labelledby="events-title">
+      <div class="audit-section__heading">
+        <div>
+          <p class="audit-page__eyebrow">Biztonsági események</p>
+          <h2 id="events-title">Legutóbbi rendszerműveletek</h2>
+        </div>
+        <span class="audit-muted">{{ totalEventCount() }} esemény</span>
+      </div>
+
+      <form class="audit-filters audit-filters--events" (submit)="$event.preventDefault(); applyEventFilters()">
+        <label>
+          Keresés
+          <input
+            type="search"
+            [value]="eventSearch()"
+            (input)="onEventSearchChange($event)"
+            maxlength="128"
+            placeholder="Felhasználó, útvonal, rekord..."
+          />
+        </label>
+        <label>
+          Eseménytípus
+          <select [value]="eventType()" (change)="onEventTypeChange($event)">
+            <option value="">Mindegyik</option>
+            <option value="HttpRequest">HTTP-kérés</option>
+            <option value="DataChange">Adatmódosítás</option>
+            <option value="Authentication">Bejelentkezés</option>
+          </select>
+        </label>
+        <label>
+          Ettől
+          <input
+            type="date"
+            [value]="eventFromDate()"
+            (change)="onEventDateChange($event, 'from')"
+          />
+        </label>
+        <label>
+          Eddig
+          <input
+            type="date"
+            [value]="eventToDate()"
+            (change)="onEventDateChange($event, 'to')"
+          />
+        </label>
+        <button class="audit-button" type="submit" [disabled]="isEventsLoading()">Szűrés</button>
+      </form>
+
+      @if (isEventsLoading()) {
+        <p class="audit-message" role="status">Események betöltése…</p>
+      }
+
+      <div class="audit-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Időpont</th>
+              <th>Típus</th>
+              <th>Felhasználó</th>
+              <th>Művelet</th>
+              <th>HTTP-állapot</th>
+              <th>IP-cím</th>
+              <th>Részletek</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (event of events(); track event.id) {
+              <tr>
+                <td>{{ event.occurredAt | date: 'yyyy. MM. dd. HH:mm:ss' }}</td>
+                <td>{{ eventTypeLabel(event.eventType) }}</td>
+                <td>
+                  {{ event.actorEmail || (event.actorUserId === null ? 'Névtelen' : '#' + event.actorUserId) }}
+                  @if (event.actorRoles) {
+                    <span class="audit-muted">({{ event.actorRoles }})</span>
+                  }
+                </td>
+                <td>
+                  <code>{{ event.method }} {{ event.resource }}</code>
+                  @if (event.entityName) {
+                    <div class="audit-muted">{{ event.entityName }} {{ event.entityId }}</div>
+                  }
+                </td>
+                <td>
+                  <span class="audit-status" [class.audit-status--error]="event.statusCode >= 400">
+                    {{ event.statusCode }}
+                  </span>
+                </td>
+                <td>{{ event.ipAddress || '—' }}</td>
+                <td>
+                  @if (event.details || event.userAgent || event.correlationId) {
+                    <details>
+                      <summary>Megnyitás</summary>
+                      @if (event.details) {
+                        <pre class="audit-details">{{ event.details }}</pre>
+                      }
+                      <div class="audit-muted">{{ event.durationMilliseconds }} ms</div>
+                      @if (event.userAgent) {
+                        <div class="audit-client">{{ event.userAgent }}</div>
+                      }
+                      @if (event.correlationId) {
+                        <code>Azonosító: {{ event.correlationId }}</code>
+                      }
+                    </details>
+                  } @else {
+                    —
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="7" class="audit-empty">Nincs a szűrésnek megfelelő esemény.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="audit-pagination" aria-label="Audit események lapozása">
+        <button
+          class="audit-button audit-button--secondary"
+          type="button"
+          (click)="moveEventPage(-1)"
+          [disabled]="eventPage() <= 1 || isEventsLoading()"
+        >
+          Előző
+        </button>
+        <span class="audit-muted">
+          {{ eventPage() }} / {{ totalEventPages() }} oldal
+        </span>
+        <button
+          class="audit-button audit-button--secondary"
+          type="button"
+          (click)="moveEventPage(1)"
+          [disabled]="eventPage() >= totalEventPages() || isEventsLoading()"
+        >
+          Következő
+        </button>
+      </nav>
+    </section>
+  }
+</main>
