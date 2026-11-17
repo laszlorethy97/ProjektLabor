@@ -32,6 +32,7 @@ const ALL_ROLES: Role[] = [
     key: 'uzemeltetesi-igazgato',
     name: 'Üzemeltetési Igazgató',
     description: 'Riportok, teremkihasználtsági statisztikák és audit logok elemzése.',
+    route: '/audit-log',
   },
 ];
 

@@ -22,6 +22,7 @@ import { AdminRoomlistComponent } from './components/admin-roomlist-component/ad
 import { AdminCreateMaintanceComponent } from './components/admin-create-maintance-component/admin-create-maintance-component';
 import { AdminCreatePermissionComponent } from './components/admin-create-permission-component/admin-create-permission-component';
 import { AdminAddEquipmentComponent } from './components/admin-add-equipment-component/admin-add-equipment-component';
+import { DirectorAuditLogComponent } from './components/director-audit-log-component/director-audit-log-component';
 
 export const routes: Routes = [{
     component: CommonComponent,
@@ -35,6 +36,14 @@ export const routes: Routes = [{
             component: SwitchRolComponent,
             path: 'switch-rol',
             canActivate: [authGuard],
+        },
+        {
+            component: DirectorAuditLogComponent,
+            path: 'audit-log',
+            canActivate: [authGuard, roleGuard],
+            data: {
+                roles: ['uzemeltetesi-igazgato']
+            }
         },
         {
             component: TutorComponent,
