@@ -23,6 +23,7 @@ public class KeyTransactionServiceTest
         var room = new Room { Id = 1, Name = "Room 1", Building = building };
         var key = new Key { Id = 1, Code = "KEY-001", CreatedBy = startedByUser, Room = room };
         room.Keys.Add(key);
+        var reservationEndTime = DateTime.UtcNow.AddHours(1);
 
         context.Users.Add(user);
         context.Users.Add(startedByUser);
@@ -31,7 +32,7 @@ public class KeyTransactionServiceTest
         {
             Id = 1,
             StartTime = DateTime.UtcNow.AddMinutes(-5),
-            EndTime = DateTime.UtcNow.AddHours(1),
+            EndTime = reservationEndTime,
             Room = room,
             User = user,
         });
@@ -48,6 +49,7 @@ public class KeyTransactionServiceTest
 
         Assert.Equal(key.Id, transaction.Key.Id);
         Assert.Equal("KEY-001", transaction.Key.Code);
+        Assert.Equal(reservationEndTime, transaction.DueAt);
     }
 
     [Fact]

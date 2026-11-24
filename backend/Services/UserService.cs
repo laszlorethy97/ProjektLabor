@@ -2,11 +2,13 @@ using KeyManagement.Api.Data;
 using KeyManagement.Api.DTO;
 using KeyManagement.Api.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace KeyManagement.Api.Services
 {
@@ -23,11 +25,18 @@ namespace KeyManagement.Api.Services
     {
         private readonly KeyManagementDbContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IHttpContextAccessor? _httpContextAccessor;
+        private readonly IConfiguration _configuration;
 
-        public UserService(KeyManagementDbContext context)
+        public UserService(
+            KeyManagementDbContext context,
+            IConfiguration configuration,
+            IHttpContextAccessor? httpContextAccessor = null)
         {
             _context = context;
+            _configuration = configuration;
             _passwordHasher = new PasswordHasher<User>();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<User>> GetAllAsync()
@@ -55,10 +64,13 @@ namespace KeyManagement.Api.Services
 
         private string BuildToken(User user)
         {
-            var key = Encoding.ASCII.GetBytes("ezEgyNagyonTitkosKulcs123!Megerkezo");
+            var signingKey = _configuration["Jwt:Key"]
+                ?? throw new InvalidOperationException("JWT key is missing.");
+            var key = Encoding.UTF8.GetBytes(signingKey);
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim> { 
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
                 };
 
                 foreach (var userRole in user.UserRoles)
@@ -76,13 +88,53 @@ namespace KeyManagement.Api.Services
         public async Task<string?> LoginUser(LoginUserDTO loginUserDTO)
         {
             User? user = await FindUserByEmailAsync(loginUserDTO.Email);
-            if (user == null || !IsPasswordValid(user, loginUserDTO.Password))
+            var successfulLogin = user is not null && IsPasswordValid(user, loginUserDTO.Password);
+            await WriteLoginAuditAsync(user, loginUserDTO.Email, successfulLogin);
+
+            if (!successfulLogin || user is null)
             {
                 return null;
             }
 
             string token = BuildToken(user);
             return token;
+        }
+
+        private async Task WriteLoginAuditAsync(User? user, string attemptedEmail, bool successful)
+        {
+            var context = _httpContextAccessor?.HttpContext;
+            _context.AuditLogs.Add(new AuditLog
+            {
+                EventType = AuditLogEventTypes.Authentication,
+                ActorUserId = successful ? user?.Id : null,
+                ActorEmail = successful ? Truncate(user?.Email, 256) : null,
+                ActorRoles = successful
+                    ? Truncate(string.Join(
+                        ",",
+                        user!.UserRoles.Select(userRole => userRole.Role.Type.ToLowerInvariant())), 256)
+                    : null,
+                Method = "LOGIN",
+                Resource = "/api/User/login",
+                Details = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    outcome = successful ? "success" : "failure",
+                    attemptedEmail = successful ? null : Truncate(attemptedEmail, 256)
+                }),
+                CorrelationId = Truncate(context?.TraceIdentifier, 64),
+                StatusCode = successful ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest,
+                OccurredAt = DateTime.UtcNow,
+                IpAddress = Truncate(context?.Connection.RemoteIpAddress?.ToString(), 45),
+                UserAgent = Truncate(context?.Request.Headers.UserAgent.ToString(), 512)
+            });
+
+            await _context.SaveChangesAsync(CancellationToken.None);
+        }
+
+        private static string? Truncate(string? value, int maximumLength)
+        {
+            return value is { Length: > 0 }
+                ? value.Length <= maximumLength ? value : value[..maximumLength]
+                : null;
         }
 
         public async Task<(bool Success, string? Error, UserRegistrationError ErrorCode)> RegisterUserAsync(

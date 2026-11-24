@@ -8,8 +8,10 @@ import { SwitchRolComponent } from './switch-rol-component';
 describe('SwitchRolComponent', () => {
   let component: SwitchRolComponent;
   let fixture: ComponentFixture<SwitchRolComponent>;
+  let userRoles: string[];
 
   beforeEach(async () => {
+    userRoles = ['admin'];
     await TestBed.configureTestingModule({
       imports: [SwitchRolComponent],
       providers: [
@@ -18,7 +20,7 @@ describe('SwitchRolComponent', () => {
           provide: AuthService,
           useValue: {
             getToken: () => 'admin-token',
-            getRoles: () => ['admin'],
+            getRoles: () => userRoles,
           },
         },
       ],
@@ -26,7 +28,6 @@ describe('SwitchRolComponent', () => {
 
     fixture = TestBed.createComponent(SwitchRolComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
     await fixture.whenStable();
   });
 
@@ -35,6 +36,7 @@ describe('SwitchRolComponent', () => {
   });
 
   it('should navigate to the admin dashboard when the admin role is selected', async () => {
+    fixture.detectChanges();
     const adminCard = (fixture.nativeElement as HTMLElement).querySelector(
       'a[href="/admin"]',
     );
@@ -44,5 +46,24 @@ describe('SwitchRolComponent', () => {
     await fixture.whenStable();
 
     expect(TestBed.inject(Router).url).toBe('/admin');
+  });
+
+  it('shows the audit log link only for the operations director role', () => {
+    fixture.detectChanges();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('a[href="/audit-log"]'),
+    ).toBeNull();
+
+    fixture.destroy();
+    userRoles = ['uzemeltetesi-igazgato'];
+    fixture = TestBed.createComponent(SwitchRolComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const auditLogLink = (fixture.nativeElement as HTMLElement).querySelector(
+      'a[href="/audit-log"]',
+    );
+    expect(auditLogLink).not.toBeNull();
+    expect(auditLogLink?.textContent).toContain('Üzemeltetési Igazgató');
   });
 });

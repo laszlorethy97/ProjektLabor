@@ -1,0 +1,22 @@
+@baseUrl = http://localhost:8081
+@directorToken = replace-with-director-jwt
+
+### Filtered, paginated security and data-change events
+GET {{baseUrl}}/api/AuditLog/events?page=1&pageSize=50&eventType=DataChange
+Authorization: Bearer {{directorToken}}
+
+### Search events by actor, route, or entity
+GET {{baseUrl}}/api/AuditLog/events?page=1&pageSize=50&search=Room&fromDate=2026-01-01&toDate=2026-12-31
+Authorization: Bearer {{directorToken}}
+
+### Overdue key returns
+GET {{baseUrl}}/api/AuditLog/overdue-keys
+Authorization: Bearer {{directorToken}}
+
+### Weekly key traffic
+GET {{baseUrl}}/api/AuditLog/traffic?period=weekly
+Authorization: Bearer {{directorToken}}
+
+### Daily room utilization (reservation count and booked hours)
+GET {{baseUrl}}/api/AuditLog/room-utilization?period=daily
+Authorization: Bearer {{directorToken}}
